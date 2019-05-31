@@ -65,9 +65,9 @@
 
 <style>
   #selectTime {
-    position: absolute;
-    bottom: 0;
-
+    /*position: absolute;*/
+    /*bottom: 0;*/
+    /*float: left;*/
   }
   .timeSelectStyle {
     padding: 0;
@@ -77,7 +77,7 @@
 
   .timeSelectStyle .el-input__inner {
     width: 160px;
-    height: 30px;
+    height: 32px;
   }
 
   .timeSelectStyle .el-input__icon {
