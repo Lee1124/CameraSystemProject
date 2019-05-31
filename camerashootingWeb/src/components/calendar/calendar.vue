@@ -86,8 +86,8 @@
 </template>
 
 <script type="text/babel">
-  import calendarContent from '../calendar/swiper-monthorweek.vue'
-  import format from '../../../../static/lib/format'
+  import calendarContent from './swiper-monthorweek.vue'
+  import format from '../../../static/lib/format'
   /*数据*/
   let dataObj = {
     disp_date: new Date(),
@@ -668,19 +668,19 @@
   }
 
   .change-format-btn .btn1 {
-    background: url("../../../../static/img/left.png") no-repeat center center;
+    background: url("../../../static/img/left.png") no-repeat center center;
   }
 
   .change-format-btn .btn2 {
-    background: url("../../../../static/img/right.png") no-repeat center center;
+    background: url("../../../static/img/right.png") no-repeat center center;
   }
 
   .change-format-btn .btn1:hover {
-    background: url("../../../../static/img/left-hover.png") no-repeat center center;
+    background: url("../../../static/img/left-hover.png") no-repeat center center;
   }
 
   .change-format-btn .btn2:hover {
-    background: url("../../../../static/img/right-hover.png") no-repeat center center;
+    background: url("../../../static/img/right-hover.png") no-repeat center center;
   }
 
 </style>

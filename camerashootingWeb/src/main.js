@@ -48,7 +48,7 @@ Vue.directive('myHeight', {
 });
 
 //全局注册组件:
-import dropSelect from './components/homePage/calendar/dropSelect'
+import dropSelect from './components/calendar/dropSelect'
 
 Vue.component('dropSelect', dropSelect);
 
