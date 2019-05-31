@@ -11,18 +11,48 @@
       <span class="user-info">职位：助理</span>
       <div class="info-phone">
         <span class="user-info phone-text">电话：13682459814</span>
-        <span class="user-info phone-change">更换</span>
+        <span class="user-info phone-change" @click="changePhone">更换</span>
       </div>
       <span class="user-info">入职：2018.05.17</span>
     </div>
+    <el-dialog
+      title="更换电话号码"
+      :modal="!dialogVisible"
+      :visible.sync="dialogVisible"
+      width="520px"
+      :modal-append-to-body="!dialogVisible"
+      :before-close="handleClose"
+      :center="dialogVisible"
+      custom-class="change-dialog"
+      class="aaa"
+    >
+      <div class="dialog-main">
+        <span class="user-info">原号码：13682459814</span>
+        <div>
+          <span class="user-info span-new">新号码：</span>
+          <el-input class="new-phone" v-model="input" placeholder="请输入内容"></el-input>
+        </div>
+        <div class="dialog-bottom">
+          <span>取消</span>
+          <el-button>保存</el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
-    return {};
+    return { dialogVisible: false, input: "" };
   },
-  methods: {}
+  methods: {
+    handleClose(done) {
+      done();
+    },
+    changePhone() {
+      this.dialogVisible = true;
+    }
+  }
 };
 </script>
 
@@ -105,5 +135,28 @@ export default {
 }
 .phone-text {
   flex: 1;
+}
+/*弹窗样式*/
+ .change-dialog {
+  width: 520px;
+  height: 400px;
+}
+
+.new-phone {
+  width: 184px;
+  height: 32px;
+  border: 1px solid rgba(221, 221, 221, 1);
+  border-radius: 5px;
+}
+
+.span-new {
+  width: auto;
+}
+
+.dialog-bottom {
+  float: right;
+}
+
+.dialog-main {
 }
 </style>
