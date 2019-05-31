@@ -46,6 +46,12 @@ Vue.directive('myHeight', {
     el.style.height = parseInt(binding.value) + 'px'
   }
 });
+//自定义指令3
+Vue.directive('focus', {
+  inserted(el,) {
+    el.focus();
+  }
+});
 
 //全局注册组件:
 import dropSelect from './components/calendar/dropSelect'

@@ -2,47 +2,47 @@
   <div id="app">
     <div class="bigBox" id="bigBox" @mouseleave="hideBigBox">
       <div class="inputBox"><!--@keyup="searchNews($event)"-->
-        <input type="text" id="inputSelect" autocomplete="off" v-model="searchText" @keyup="searchNo($event)" class="inputSelect" @focus="showSelectBox" placeholder="请输入酒店，客户姓名，负责人，添加人...">
+        <input type="text" id="inputSelect" autocomplete="off" v-model="searchText"  @keyup="searchNo($event)" class="inputSelect" @focus="inputFocus($event)" @blur="inputBlur($event)" placeholder="请输入查询内容">
         <div class="searchBtn" @click="searchNews"><!--@click="searchNews"-->
           <span></span>
-          <img src="../../../static/img/search.png" alt="搜索">
+          <img src="../../../../static/img/common/search.png" alt="搜索">
         </div>
         <div class="addInput" v-show="isShowAddInput" @mouseenter="showAddInput">
           <template v-for="(items,index) in selectData">
             <div class="addInput_inner">
               {{items.contentName2}}
-              <img src="../../../static/img/close2.png" @click="closeSelect(items)" alt="关闭">
+              <!--<img src="../../../../static/img/common/close2.png" @click="closeSelect(items)" alt="关闭">-->
             </div>
           </template>
         </div>
       </div>
 
       <div id="selectBox" class="selectBox" v-loading="loading" v-show="isShowSelectBox"><!--v-show="isShowSelectBox"--><!--v-loading="loading"-->
-        <!--最近搜索-->
-        <div class="select_content" style="display: none;">
-          <span class="label">最近搜索：</span>
-          <ul class="select_content_inner">
-            <li><span>某酒店名</span></li><!--class="select_name"-->
-            <li><span>某酒店名</span></li><!--class="select_name"-->
-            <li><span>某酒店名</span></li><!--class="select_name"-->
-          </ul>
-        </div>
-        <template v-for="(items1,index1) in contentData">
-          <div class="select_content">
-            <span class="label">{{items1.titleName}}：</span>
-            <ul class="select_content_inner">
-              <template v-for="(items2,index2) in items1.data">
-                <li><span :class="{'select_name':items2.isShowBorder}"
-                          @click="selectThis(items1,items2,index1,index2)">{{items2.contentName}}</span>
-                </li>
-              </template>
-            </ul>
-            <div class="address" v-if="items1.titleName=='店铺选择'">
-              <img src="../../../static/img/address.png" alt="地区">
-              <span>四川</span>
-            </div>
-          </div>
-        </template>
+        <!--&lt;!&ndash;最近搜索&ndash;&gt;-->
+        <!--<div class="select_content" style="display: none;">-->
+          <!--<span class="label">最近搜索：</span>-->
+          <!--<ul class="select_content_inner">-->
+            <!--<li><span>某酒店名</span></li>&lt;!&ndash;class="select_name"&ndash;&gt;-->
+            <!--<li><span>某酒店名</span></li>&lt;!&ndash;class="select_name"&ndash;&gt;-->
+            <!--<li><span>某酒店名</span></li>&lt;!&ndash;class="select_name"&ndash;&gt;-->
+          <!--</ul>-->
+        <!--</div>-->
+        <!--<template v-for="(items1,index1) in contentData">-->
+          <!--<div class="select_content">-->
+            <!--<span class="label">{{items1.titleName}}：</span>-->
+            <!--<ul class="select_content_inner">-->
+              <!--<template v-for="(items2,index2) in items1.data">-->
+                <!--<li><span :class="{'select_name':items2.isShowBorder}"-->
+                          <!--@click="selectThis(items1,items2,index1,index2)">{{items2.contentName}}</span>-->
+                <!--</li>-->
+              <!--</template>-->
+            <!--</ul>-->
+            <!--<div class="address" v-if="items1.titleName=='店铺选择'">-->
+              <!--<img src="../../../static/img/address.png" alt="地区">-->
+              <!--<span>四川</span>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</template>-->
       </div>
     </div>
   </div>
@@ -76,8 +76,16 @@
       this.$emit('closeSelect',obj)
     },
     //获取光标显示
-    showSelectBox() {
-      this.$emit('showSelectBox')
+    inputFocus(e) {
+      // this.$emit('showSelectBox')
+      $(e.target).css('border','1px solid #9AB6E4')
+
+    },
+    //获取光标显示
+    inputBlur(e) {
+      // this.$emit('showSelectBox')
+      $(e.target).css('border','')
+
     },
     //移入显示
     showAddInput(){
@@ -110,6 +118,12 @@
     },
     mounted() {
       window.Vue = this
+    },
+    //自定义私有指令
+    directives:{
+      'borderStyle':function (el,binding) {
+        el.style.border='1px solid #9AB6E4'
+      }
     }
   }
 </script>
@@ -121,7 +135,7 @@
   }
 
   /deep/ .el-loading-spinner {
-    background: url("../../../static/img/loading.gif") no-repeat;
+    /*background: url("../../../static/img/loading.gif") no-repeat;*/
     background-size: 30px 30px;
     position: absolute;
     width: 30px;
@@ -156,11 +170,12 @@
   /*搜索框*/
   .inputBox {
     position: relative;
-    width: 420px;
+    width: 300px;
+    margin-left: 25px;
   }
 
   .inputSelect {
-    width: 420px;
+    width: 300px;
     height: 32px;
     border: 1px solid #DDD;
     border-radius: 4px;
