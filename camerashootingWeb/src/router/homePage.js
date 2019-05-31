@@ -3,6 +3,7 @@ import Calender from '@/components/homePage/calendar/calendar';
 import demoPage from '@/components/demoPage/demoPage';
 import orderManage from '@/components/orderManage/orderManage';
 import orderManageOurShop from '@/components/orderManage/orderManage-ourShop/orderManage-ourShop';
+import setting from '@/components/setting/settingHome';
 
 export default [
   {
@@ -21,6 +22,11 @@ export default [
         component: demoPage,
       },
       {
+        path: '/personal',
+        name: 'personal',
+        component: setting,
+      },
+      {
         path: '/orderManage',
         name: 'orderManage',
         component: orderManage,
@@ -29,9 +35,9 @@ export default [
             path: '/',
             name: 'orderManageOurShop',
             component: orderManageOurShop,
-          },
+          }
         ]
-      },
+      }
     ]
   }
 ]
