@@ -97,8 +97,8 @@ html, body {
   color: #5996F8 !important;
 }
 
-.monthValuePicker {
-  top: 240px !important;
+.monthValuePicker{
+  margin-top: 20px!important;
 }
 
 .monthValuePicker .el-month-table td .cell:hover, .el-month-table td.current:not(.disabled) .cell {

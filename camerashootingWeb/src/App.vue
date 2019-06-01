@@ -18,7 +18,7 @@
   #app {
     height: 100%;
     min-width: 1350px;
-    min-height: 640px;
+    min-height: 625px;
   }
 
 </style>

@@ -252,6 +252,27 @@ var calendar = {
   },
 
   /**
+   * 传入年份月份返回第n个星期日的日期数字
+   * @param y 年份
+   * @param m 月份
+   * @param n 第几个星期日 ( 5>n>0的数字 一个月一般就4个星期日，最多5个)
+   * @return 日期数字；3 ＝ getSunday(2017,9,1); 九月的第一个星期日是3号；超出返回-1
+   */
+  getSunday(y, m, n) {
+    var d = new Date(y + '-' + m + '-1');
+    var d2 = new Date(y + '-' + (m + 1) + '-1');
+    d2.setDate(0);
+    var maxDay = d2.getDate(); //传入月份的最后一天
+
+    var week = d.getDay();
+    var first = 1;
+    if (week > 0) first = d.getDate() + (7 - week);
+    var result = (n - 1) * 7 + first;
+    if (result > maxDay) return -1;
+    return result;
+  },
+
+  /**
    * 传入农历数字月份返回汉语通俗表示法
    * @param lunar month
    * @return Cn string
@@ -414,28 +435,28 @@ var calendar = {
     if (offset < 0) {
       offset += temp;
       --i;
-    } //农历月
+    }
 
+    //农历月
+    var month = i;
 
-    var month = i; //农历日
+    //农历日
+    var day = offset + 1;
 
-    var day = offset + 1; //天干地支处理
-
+    //天干地支处理
     var sm = m - 1;
     var gzY = calendar.toGanZhiYear(year); //月柱 1900年1月小寒以前为 丙子月(60进制12)
-
     var firstNode = calendar.getTerm(year, m * 2 - 1); //返回当月「节」为几日开始
 
     var secondNode = calendar.getTerm(year, m * 2); //返回当月「节」为几日开始
+
     //依据12节气修正干支月
-
     var gzM = calendar.toGanZhi((y - 1900) * 12 + m + 11);
-
     if (d >= firstNode) {
       gzM = calendar.toGanZhi((y - 1900) * 12 + m + 12);
-    } //传入的日期的节气与否
+    }
 
-
+    //传入的日期的节气与否
     var isTerm = false;
     var Term = null;
 
@@ -447,13 +468,72 @@ var calendar = {
     if (secondNode == d) {
       isTerm = true;
       Term = calendar.solarTerm[m * 2 - 1];
-    } //日柱 当月一日与 1900/1/1 相差天数
+    }
 
-
+    //日柱 当月一日与 1900/1/1 相差天数
     var dayCyclical = Date.UTC(y, sm, 1, 0, 0, 0, 0) / 86400000 + 25567 + 10;
-    var gzD = calendar.toGanZhi(dayCyclical + d - 1); //该日期所属的星座
+    var gzD = calendar.toGanZhi(dayCyclical + d - 1);
 
+    //该日期所属的星座
     var astro = calendar.toAstro(m, d);
+
+    //该日期所有的节日
+    var festival = [];
+    //农历传统节日
+    if (month == 1 && day == 1) {
+      festival.push('春节');
+    } else if (month == 1 && day == 15) {
+      festival.push('上元节');
+    } else if (month == 2 && day == 2) {
+      festival.push('龙抬头');
+    } else if (month == 5 && day == 5) {
+      festival.push('端午节');
+    } else if (month == 7) {
+      if (day == 7) festival.push('七夕节');
+      if (day == 15) festival.push('中元节');
+    } else if (month == 8 && day == 15) {
+      festival.push('中秋节');
+    } else if (month == 9 && day == 9) {
+      festival.push('重阳节');
+    } else if (month == 10 && day == 15) {
+      festival.push('下元节');
+    } else if (month == 12) {
+      if (day == 8) festival.push('腊八节');
+      if (day == 23) festival.push('小年');
+      if (isLeap ? day == calendar.leapDays(year) : calendar.monthDays(month - 1) == 29 ? day == 30 : day == 29) festival.push('除夕');
+    }
+    //公历节日
+    if (m == 1 && d == 1) {
+      festival.splice(0, 0, '元旦节');
+    } else if (m == 2 && d == 14) {
+      festival.push('情人节');
+    } else if (m == 3) {
+      if (d == 8) festival.push('妇女节');
+      if (d == 12) festival.push('植树节');
+    } else if (m == 4 && d == 1) {
+      festival.push('愚人节');
+    } else if (m == 5) {
+      if (d == 1) festival.push('劳动节');
+      if (d == 4) festival.push('青年节');
+      if (d == calendar.getSunday(y, m, 2)) festival.push('母亲节');
+    } else if (m == 6) {
+      if (d == 1) festival.push('儿童节');
+      // if (d == 4) festival.push('青年节');
+      if (d == calendar.getSunday(y, m, 3)) festival.push('父亲节');
+    } else if (m == 7 && d == 1) {
+      festival.push('建党节');
+    } else if (m == 8 && d == 1) {
+      festival.push('建军节');
+    } else if (m == 9 && d == 10) {
+      festival.push('教师节');
+    } else if (m == 10 && d == 1) {
+      festival.push('国庆节');
+    } else if (m == 11 && d == 1) {
+      festival.push('万圣节');
+    } else if (m == 12) {
+      if (d == 24) festival.push('平安夜');
+      if (d == 25) festival.push('圣诞节');
+    }
 
     if (day == 1) {
       if (isTerm) {
@@ -491,8 +571,8 @@ var calendar = {
       'isTerm': isTerm,
       'Term': Term,
       'astro': astro,
-      old_str: old_str,
-      textColor: textColor
+      old_str: festival.length > 0?festival[0]: old_str,
+      textColor: festival.length > 0?'#5996F8':textColor
     };
   },
 

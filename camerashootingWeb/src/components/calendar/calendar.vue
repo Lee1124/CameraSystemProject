@@ -64,7 +64,7 @@
                       @click="chooseDay(day.year,day.month,day.day,day.othermonth,day.mode)">
                     <div class="week-day"
                          :class="{ischecked:checkedDay==day.date,othermonth:day.othermonth,istoday:day.istoday}">
-              <span style="padding-top:3px;display:block;" class="daySpanBox" :class="{todaySpanBox:day.istoday}">
+              <span style="padding-top:3px;display:flex;" class="daySpanBox" :class="{todaySpanBox:day.istoday}">
   				    	<i class="day">{{day.day}}</i>
   				    	<i :style="{color:day.nongli.textColor}">{{day.nongli.old_str}}</i>
               </span>
@@ -107,6 +107,7 @@
     list: [
       {name: '[ 直客 ] 20190501 陈建州&范玮琪陈建州&范玮琪陈建州&范玮琪', color: '#EA0404'},
       {name: '[ 直客 ] 20190501 陈建州&范玮琪', color: '#FFAE00'},
+      {name: '[ 直客 ] 20190501 陈建州&范玮琪', color: '#A1A7B0'},
       {name: '[ 直客 ] 20190501 陈建州&范玮琪', color: '#A1A7B0'},
     ],
 
@@ -562,8 +563,8 @@
     float: left;
   }
 
-  .week-day i:nth-child(1) {
-    margin-right: 3px;
+  .week-day i:nth-child(2) {
+    margin-left: 2px;
   }
 
   .thing a {
@@ -594,7 +595,7 @@
   /*}*/
 
   .daySpanBox {
-    width: 58px;
+    width: 90%;
     height: 22px;
     padding: 0 5px;
     border-radius: 11px;
@@ -608,7 +609,7 @@
   }
 
   .todaySpanBox i {
-    color: #fff;
+    color: #fff!important;
   }
 
   .haveThing {
