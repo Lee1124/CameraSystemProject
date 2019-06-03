@@ -12,6 +12,7 @@
 #公用
 1、components/common/selectTime/selectTime.vue  --时间选择(开始与截止)
 2、components/common/inputSelect/inputSelect.vue  --高级搜索
+3、components/common/sideNav/sideNav  --侧边导航
 
 #私有
 1、components/login/login  --登录

@@ -1,7 +1,9 @@
 <template>
   <div id="homePage">
     <el-container>
-      <el-aside width="14.2%">Aside</el-aside>
+      <el-aside width="14.2%">
+        <sideNav></sideNav>
+      </el-aside>
       <el-container>
         <el-header>Header</el-header>
         <el-main>
@@ -13,6 +15,7 @@
 </template>
 
 <script>
+  import sideNav from '../common/sideNav/sideNav'
   /*数据*/
   let dataObj = {};
   /*方法*/
@@ -28,6 +31,9 @@
       // console.log($(window).width())
       // console.log($(window).height())
     },
+    components:{
+      sideNav:sideNav
+    }
   }
 </script>
 
@@ -54,7 +60,6 @@
     background-color: #1D213E;
     color: #fff;
     text-align: center;
-    line-height: 200px;
     min-width: 200px;
   }
 

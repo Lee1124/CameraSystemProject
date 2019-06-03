@@ -684,4 +684,14 @@
     background: url("../../../static/img/right-hover.png") no-repeat center center;
   }
 
+  @media (min-width: 1600px) {
+    .daySpanBox {
+      width: 52%;
+    }
+  }
+  @media (max-width: 1600px) {
+    .daySpanBox {
+      width: 72%;
+    }
+  }
 </style>
