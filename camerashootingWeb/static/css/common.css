@@ -29,7 +29,9 @@
 /*visibility: hidden;*/
 /*}*/
 
-.workBox .list::-webkit-scrollbar {
+.workBox .list::-webkit-scrollbar,
+.nav ul::-webkit-scrollbar
+{
   width: 3px;
   background: #E7EEF9;
   -webkit-border-radius: 1px;
@@ -37,7 +39,9 @@
   border-radius: 1px;
 }
 
-.workBox .list::-webkit-scrollbar-thumb {
+.workBox .list::-webkit-scrollbar-thumb,
+.nav ul::-webkit-scrollbar-thumb
+{
   background-color: #CED8EA;
   width: 3px;
   -webkit-border-radius: 1px;
