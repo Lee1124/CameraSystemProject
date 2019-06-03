@@ -2,7 +2,7 @@
   <div id="sideNav">
     <div class="hd">
       <div class="logoBox"></div>
-      <div class="title"> <span style="font-weight: 700">- </span>管理系统</div>
+      <div class="title"><span style="font-weight: 700">- </span>管理系统</div>
     </div>
 
     <div class="nav">
@@ -36,7 +36,7 @@
         url2: '../../../../static/img/common/home2.png',
         isSelected: true,
         isEnter: true,
-        path:'/homePage'
+        path: '/homePage'
       },
       {
         name: '订单',
@@ -44,7 +44,7 @@
         url2: '../../../../static/img/common/order2.png',
         isSelected: false,
         isEnter: false,
-        path:'/orderManage'
+        path: '/orderManage'
       },
       {
         name: '设备',
@@ -52,7 +52,7 @@
         url2: '../../../../static/img/common/shebei2.png',
         isSelected: false,
         isEnter: false,
-        path:'/demoPage'
+        path: '/demoPage'
       },
       {
         name: '财务',
@@ -60,7 +60,7 @@
         url2: '../../../../static/img/common/price2.png',
         isSelected: false,
         isEnter: false,
-        path:'/demoPage'
+        path: '/demoPage'
       },
       {
         name: '统计',
@@ -68,7 +68,7 @@
         url2: '../../../../static/img/common/tj2.png',
         isSelected: false,
         isEnter: false,
-        path:'/demoPage'
+        path: '/demoPage'
       },
       {
         name: '设置',
@@ -76,7 +76,7 @@
         url2: '../../../../static/img/common/set2.png',
         isSelected: false,
         isEnter: false,
-        path:'/personal'
+        path: '/personal'
       },
     ]
   };
@@ -93,14 +93,26 @@
       }
     },
     //选择当前
-    selectThis(itemObj){
-      this.navData.forEach((item,index,arr)=>{
-        arr[index].isSelected=false;
-        arr[index].isEnter=false;
+    selectThis(itemObj) {
+      this.navData.forEach((item, index, arr) => {
+        arr[index].isSelected = false;
+        arr[index].isEnter = false;
       });
-      itemObj.isSelected=true;
-      itemObj.isEnter=true;
-      this.$router.push({path:itemObj.path})
+      itemObj.isSelected = true;
+      itemObj.isEnter = true;
+      this.$router.push({path: itemObj.path})
+    },
+    //判断路由
+    getRouter(){
+      let $path=this.$route.path;
+      this.navData.forEach((item,index,arr)=>{
+        arr[index].isSelected = false;
+        arr[index].isEnter = false;
+        if ($path==arr[index].path){
+          arr[index].isSelected = true;
+          arr[index].isEnter = true;
+        }
+      })
     }
   };
   export default {
@@ -110,6 +122,8 @@
     },
     methods: myMethods,
     created() {
+      this.getRouter();
+      console.log(this.$route.path)
 
     },
   }
