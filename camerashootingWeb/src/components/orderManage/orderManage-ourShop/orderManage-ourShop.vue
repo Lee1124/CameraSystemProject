@@ -13,44 +13,61 @@
           <el-table-column
             :label="items.name"
             show-overflow-tooltip
-            v-if="items.id!=6&&items.id!=7&&items.id!=12&&items.id!=13"
+            v-if="items.id!=1&&items.id!=2&&items.id!=6&&items.id!=7&&items.id!=12&&items.id!=13"
             align="center">
             <template slot-scope=scope>
-              <span v-if="items.id==1&&scope.row.isHeJi==undefined"><a href="#">详情</a></span>
-              <span v-if="items.id==1&&scope.row.isHeJi">合计：</span>
-              <span v-if="items.id==2">{{scope.row.date}}</span>
               <span v-if="items.id==3">{{scope.row.hotel}}</span>
               <span v-if="items.id==4">{{scope.row.hunQ}}</span>
               <span v-if="items.id==5">{{scope.row.keHu}}</span>
-              <span v-if="items.id==6">{{scope.row.xm}}</span>
-              <span v-if="items.id==7">{{scope.row.zt}}</span>
               <span v-if="items.id==8">{{scope.row.xs}}</span>
               <span v-if="items.id==9">{{scope.row.ps}}</span>
               <span v-if="items.id==10">{{scope.row.hq}}</span>
               <span v-if="items.id==11">{{scope.row.kf}}</span>
-              <span v-if="items.id==12">{{scope.row.price}}</span>
-              <span v-if="items.id==13">{{scope.row.ht}}</span>
             </template>
           </el-table-column>
+
           <el-table-column
             :label="items.name"
             show-overflow-tooltip
-            v-if="items.id==6||items.id==7||items.id==12||items.id==13"
-            sortable="custom"
+            v-if="items.id==1"
+            width="80"
             align="center">
             <template slot-scope=scope>
               <span v-if="items.id==1&&scope.row.isHeJi==undefined"><a href="#">详情</a></span>
               <span v-if="items.id==1&&scope.row.isHeJi">合计：</span>
-              <span v-if="items.id==2">{{scope.row.date}}</span>
-              <span v-if="items.id==3">{{scope.row.hotel}}</span>
-              <span v-if="items.id==4">{{scope.row.hunQ}}</span>
-              <span v-if="items.id==5">{{scope.row.keHu}}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            :label="items.name"
+            show-overflow-tooltip
+            v-if="items.id==2"
+            width="100"
+            align="center">
+            <template slot-scope=scope>
+              <span>{{scope.row.date}}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            :label="items.name"
+            show-overflow-tooltip
+            v-if="items.id==7"
+            sortable="custom"
+            align="center">
+            <template slot-scope=scope>
+              <span>{{scope.row.zt}}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            :label="items.name"
+            show-overflow-tooltip
+            v-if="items.id==6||items.id==12||items.id==13"
+            sortable="custom"
+            align="center">
+            <template slot-scope=scope>
               <span v-if="items.id==6">{{scope.row.xm}}</span>
-              <span v-if="items.id==7">{{scope.row.zt}}</span>
-              <span v-if="items.id==8">{{scope.row.xs}}</span>
-              <span v-if="items.id==9">{{scope.row.ps}}</span>
-              <span v-if="items.id==10">{{scope.row.hq}}</span>
-              <span v-if="items.id==11">{{scope.row.kf}}</span>
               <span v-if="items.id==12">{{scope.row.price}}</span>
               <span v-if="items.id==13">{{scope.row.ht}}
                 <span class="fillSpan"></span>
@@ -366,6 +383,7 @@
 
   >>> .el-table__body-wrapper::-webkit-scrollbar {
     width: 3px;
+    height: 5px;
     background: #E7EEF9;
     -webkit-border-radius: 1px;
     -moz-border-radius: 1px;
@@ -375,6 +393,7 @@
   >>> .el-table__body-wrapper::-webkit-scrollbar-thumb {
     background-color: #CED8EA;
     width: 3px;
+    height: 5px;
     -webkit-border-radius: 1px;
     -moz-border-radius: 1px;
     border-radius: 1px;
@@ -473,6 +492,9 @@
 
   .bigTableBox >>> .orderTableRowStyle:last-of-type td span {
     margin-left: 20px;
+  }
+  .bigTableBox >>> .orderTableRowStyle:last-of-type td:first-of-type span {
+    margin-left:0;
   }
 
   >>> .orderTableRowStyle:last-of-type td:first-of-type {

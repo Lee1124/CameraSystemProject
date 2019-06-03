@@ -108,7 +108,7 @@
       this.navData.forEach((item,index,arr)=>{
         arr[index].isSelected = false;
         arr[index].isEnter = false;
-        if ($path==arr[index].path){
+        if ($path.indexOf(arr[index].path)!=-1){
           arr[index].isSelected = true;
           arr[index].isEnter = true;
         }
