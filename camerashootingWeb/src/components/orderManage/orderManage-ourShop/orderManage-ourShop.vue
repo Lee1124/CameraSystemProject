@@ -8,19 +8,19 @@
         :style="{border:0,borderTop:'1px solid #DDD'}"
         :header-row-class-name="headerClassName"
         :row-class-name="rowClassName"
+        @cell-mouse-leave="hideRightClickMenu"
         style="width: 100%;text-align: center">
         <template v-for="(items,index) in colData">
           <el-table-column
             :label="items.name"
             show-overflow-tooltip
-            v-if="items.id!=1&&items.id!=2&&items.id!=6&&items.id!=7&&items.id!=12&&items.id!=13"
+            v-if="items.id!=1&&items.id!=2&&items.id!=6&&items.id!=7&&items.id!=9&&items.id!=12&&items.id!=13"
             align="center">
             <template slot-scope=scope>
               <span v-if="items.id==3">{{scope.row.hotel}}</span>
               <span v-if="items.id==4">{{scope.row.hunQ}}</span>
               <span v-if="items.id==5">{{scope.row.keHu}}</span>
               <span v-if="items.id==8">{{scope.row.xs}}</span>
-              <span v-if="items.id==9">{{scope.row.ps}}</span>
               <span v-if="items.id==10">{{scope.row.hq}}</span>
               <span v-if="items.id==11">{{scope.row.kf}}</span>
             </template>
@@ -42,21 +42,49 @@
             :label="items.name"
             show-overflow-tooltip
             v-if="items.id==2"
-            width="100"
+            width="110"
             align="center">
             <template slot-scope=scope>
+              <span v-if="scope.row.isCQ" style="font-weight: 700;color: red;">!</span>
               <span>{{scope.row.date}}</span>
             </template>
           </el-table-column>
 
           <el-table-column
             :label="items.name"
-            show-overflow-tooltip
             v-if="items.id==7"
             sortable="custom"
+            width='100'
             align="center">
             <template slot-scope=scope>
               <span>{{scope.row.zt}}</span>
+              <div class="rightClickShadow" @contextmenu.prevent="rightClick($event,scope.row)"></div>
+              <div class="rightClickContent" v-show="scope.row.isShowRightMenu">
+                <ul>
+                  <li>回馈表(已确认)</li>
+                  <li>拍摄交接单(未填)</li>
+                  <li>设备清单(未领用)</li>
+                </ul>
+              </div>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            :label="items.name"
+            v-if="items.id==9"
+            sortable="custom"
+            width="160"
+            align="center">
+            <template slot-scope=scope>
+              <span v-if="items.id==9">
+                <template v-for="(item2,index) in scope.row.ps">
+                  <span class="morePS" v-if="index<=1">{{item2}}<i>、</i></span>
+                </template>
+                <span class="moreImg" v-if="scope.row.ps.length>2"></span>
+                <span class="moreList">
+
+                </span>
+              </span>
             </template>
           </el-table-column>
 
@@ -98,10 +126,12 @@
       {name: '客户', id: 5},
       {name: '项目', id: 6},
       {name: '状态', id: 7},
+
       {name: '销售', id: 8},
       {name: '拍摄', id: 9},
       {name: '后期', id: 10},
       {name: '客服', id: 11},
+
       {name: '金额', id: 12},
       {name: '合同', id: 13}
     ],
@@ -114,11 +144,14 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦', '哈哈哈'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: true,
+        isShowRightMenu: false,
+        id: 1,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -127,11 +160,13 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: false,
+        isShowRightMenu: false,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -140,11 +175,13 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: true,
+        isShowRightMenu: false,
       },
       {
         date: '2016.05.02',
@@ -154,11 +191,13 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: true,
+        isShowRightMenu: false,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -167,11 +206,13 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: true,
+        isShowRightMenu: false,
       },
       {
         date: '2016.05.02',
@@ -181,11 +222,13 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: true,
+        isShowRightMenu: false,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -194,11 +237,13 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: true,
+        isShowRightMenu: false,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -207,11 +252,13 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: '小李',
-        ps: '小巫师',
+        ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
         price: '1000',
         ht: '1000',
+        isCQ: true,
+        isShowRightMenu: false,
       },
       // {
       //   date: '2016.05.02',
@@ -296,6 +343,14 @@
   };
   /*方法*/
   let myMethods = {
+    //隐藏右击菜单
+    hideRightClickMenu(row, column, cell, event) {
+      row.isShowRightMenu = false;
+    },
+    //右击事件
+    rightClick(e, rowObj) {
+      rowObj.isShowRightMenu = true;
+    },
     headerClassName({row, rowIndex}) {
       return 'orderTableHeaderStyle'
     },
@@ -493,8 +548,9 @@
   .bigTableBox >>> .orderTableRowStyle:last-of-type td span {
     margin-left: 20px;
   }
+
   .bigTableBox >>> .orderTableRowStyle:last-of-type td:first-of-type span {
-    margin-left:0;
+    margin-left: 0;
   }
 
   >>> .orderTableRowStyle:last-of-type td:first-of-type {
@@ -529,5 +585,79 @@
   >>> .orderTableRowStyle:last-of-type:hover td {
     background: #F6F6F6 !important;
     color: #FF0000;
+  }
+
+  >>> .el-table .cell.el-tooltip {
+    padding: 0 4px;
+  }
+
+  .rightClickShadow {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+  }
+
+  .rightClickContent {
+    position: fixed;
+    z-index: 999;
+    background: #fff;
+    width: 120px;
+    border: 1px solid rgba(220, 230, 245, 1);
+    border-radius: 5px;
+    margin-left: 15px;
+    margin-top: 5px;
+    padding: 10px 0;
+  }
+
+  .rightClickContent::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+    top: -5px;
+    left: 17px;
+    border: 1px solid rgba(220, 230, 245, 1);
+    border-bottom: 0;
+    border-right: 0;
+  }
+
+  .rightClickContent li {
+    height: 32px;
+    line-height: 32px;
+    font-size: 12px;
+    color: #808080;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .rightClickContent li:hover {
+    color: #5996F8;
+    background: #EFF3F9;
+  }
+
+  .morePS:nth-of-type(2) i {
+    display: none;
+  }
+
+  .moreImg {
+    display: inline-block;
+    width: 30px;
+    height: 18px;
+    vertical-align: -4px;
+    background: url("../../../../static/img/order/more1.png") no-repeat center center;
+    transition: all .2s;
+    cursor: pointer;
+  }
+
+  .moreImg:hover {
+    background: url("../../../../static/img/order/more2.png") no-repeat center center;
   }
 </style>
