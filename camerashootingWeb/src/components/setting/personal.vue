@@ -27,13 +27,15 @@
       class="aaa"
     >
       <div class="dialog-main">
-        <span class="user-info">原号码：13682459814</span>
         <div>
-          <span class="user-info span-new">新号码：</span>
-          <el-input class="new-phone" v-model="input" placeholder="请输入内容"></el-input>
+          <span class="user-info">原号码：13682459814</span>
+          <div>
+            <span class="user-info span-new">新号码：</span>
+            <el-input class="new-phone" v-model="input" placeholder="请输入内容"></el-input>
+          </div>
         </div>
         <div class="dialog-bottom">
-          <span>取消</span>
+          <el-button type="text">取消</el-button>
           <el-button>保存</el-button>
         </div>
       </div>
@@ -137,7 +139,7 @@ export default {
   flex: 1;
 }
 /*弹窗样式*/
- .change-dialog {
+.change-dialog {
   width: 520px;
   height: 400px;
 }
@@ -158,5 +160,42 @@ export default {
 }
 
 .dialog-main {
+  width: 315px;
+  height: 225px;
 }
 </style>
+<style lang="scss">
+.change-dialog {
+  width: 520px;
+  height: 396px;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
+}
+.el-dialog__title {
+  width: 101px;
+  height: 18px;
+  font-size: 17px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(157, 179, 215, 1);
+  line-height: 26px;
+}
+
+.el-dialog__body {
+  padding: 0px !important;
+}
+
+.new-phone {
+  width: 184px;
+  height: 32px;
+  border: none;
+  border-radius: 5px;
+}
+
+.el-input__inner {
+  width: 184px;
+  height: 32px;
+  border: 1px solid rgba(221, 221, 221, 1);
+}
+</style>
+
