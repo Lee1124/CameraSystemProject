@@ -54,7 +54,7 @@
   }
   .orderManage-ct {
     height: 80%;
-    padding: 30px 35px 100px;
+    padding: 30px 35px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
