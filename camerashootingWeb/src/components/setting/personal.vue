@@ -17,7 +17,7 @@
     </div>
     <el-dialog
       title="更换电话号码"
-      :modal="!dialogVisible"
+      :modal="dialogVisible"
       :visible.sync="dialogVisible"
       width="520px"
       :modal-append-to-body="!dialogVisible"

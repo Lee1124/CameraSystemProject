@@ -1,7 +1,7 @@
 <template>
   <div class="setting-content">
     <el-menu
-      default-active="personal"
+      default-active="user"
       class="el-menu-demo noSelect noBorder"
       mode="horizontal"
       text-color="#1D213E"
@@ -15,15 +15,17 @@
       <el-menu-item index="other">其他参数</el-menu-item>
     </el-menu>
     <Personal v-show="activeItem=='personal'"></Personal>
+    <UserManage v-show="activeItem=='user'"></UserManage>
   </div>
 </template>
 <script>
 import Personal from "@/components/setting/personal";
+import UserManage from "@/components/setting/userManage";
 export default {
-  components: { Personal },
+  components: { Personal, UserManage },
   data() {
     return {
-      activeItem: "personal"
+      activeItem: "user"
     };
   },
   methods: {
