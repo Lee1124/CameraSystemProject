@@ -46,7 +46,7 @@
   }
   .orderManage-hd {
     height: 20%;
-    padding: 35px 45px;
+    padding: 2.2% 35px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -54,7 +54,7 @@
   }
   .orderManage-ct {
     height: 80%;
-    padding: 30px 35px;
+    padding: 30px 35px 100px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
