@@ -76,7 +76,7 @@
         url2: '../../../../static/img/common/set2.png',
         isSelected: false,
         isEnter: false,
-        path: '/personal'
+        path:'/settingHome'
       },
     ]
   };
