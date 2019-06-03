@@ -22,8 +22,8 @@ export default [
         component: demoPage,
       },
       {
-        path: '/personal',
-        name: 'personal',
+        path: '/settingHome',
+        name: 'settingHome',
         component: setting,
       },
       {
