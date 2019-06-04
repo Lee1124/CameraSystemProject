@@ -584,15 +584,12 @@
     background: #F0F4FA !important;
   }
 
-  /*>>> .orderTableRowStyle:last-of-type:hover td {*/
-  /*background: #F6F6F6 !important;*/
-  /*color: #FF0000;*/
-  /*}*/
   >>> .el-table__footer-wrapper .has-gutter td {
     background: #F6F6F6;
     border-color: #F6F6F6;
     color: #FF0000;
     font-weight: 700;
+    border-top: 1px solid #DDD;
   }
 
   >>> .el-table__footer-wrapper .has-gutter td:first-of-type {
