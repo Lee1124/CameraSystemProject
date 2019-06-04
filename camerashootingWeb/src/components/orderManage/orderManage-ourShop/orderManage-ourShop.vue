@@ -71,7 +71,7 @@
 
           <el-table-column
             :label="items.name"
-            
+
             v-if="items.id==9"
             sortable="custom"
             width="160"
