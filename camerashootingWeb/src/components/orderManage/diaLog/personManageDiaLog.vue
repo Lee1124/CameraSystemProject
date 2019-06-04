@@ -1,10 +1,11 @@
 <template>
   <div id="personManage">
     <el-dialog
-      title="20190501 成都丽思卡尔顿（高清双机）人员安排"
+      :title="rowObj.hotel"
       :visible.sync="showPersonManageDiaLog"
       custom-class="dialogBox1"
       :modal="false"
+      :before-close="closeBefore"
       :show-close="false">
       <i class="closeIcon" @click="closeTip"></i>
       <div class="content clearfloat">
@@ -56,11 +57,14 @@
   let myMethods = {
     closeTip() {
       this.$parent.closeDialog();
+    },
+    closeBefore(){
+      this.$parent.closeDialog();
     }
   };
   export default {
     name: "personManage",
-    props: ['showPersonManageDiaLog'],
+    props: ['showPersonManageDiaLog','rowObj'],
     data() {
       return dataObj;
     },

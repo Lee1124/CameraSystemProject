@@ -2,7 +2,7 @@
   <div id="orderManageTable" ref="orderManageTable" :style="{opacity:orderManageTableOpacity}">
 
     <!--弹框-->
-    <personManageDiaLog :showPersonManageDiaLog="showPersonManageDiaLog"></personManageDiaLog>
+    <personManageDiaLog :rowObj="rowObj" :showPersonManageDiaLog="showPersonManageDiaLog"></personManageDiaLog>
 
     <div ref="tableBox" :class="['tableBox']">
       <el-table
@@ -128,32 +128,32 @@
                 <span v-if="scope.row.kf.length==0"><a href="#" class="commonColor">添加</a></span>
               </span>
               <div class="rightClickShadow" v-if="items.id==8&&scope.row.xs.length==1"
-                   @contextmenu.prevent="shotPersonRightClick2($event,scope.row,'sale')">
+                   @contextmenu.prevent="shotPersonRightClick($event,scope.row,'sale')">
                 <commonMenu :menuData="menuData" v-show="scope.row.isShowSaleMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
               <div class="rightClickShadow" v-if="items.id==10&&scope.row.hq.length==1"
-                   @contextmenu.prevent="shotPersonRightClick2($event,scope.row,'lastTime')">
+                   @contextmenu.prevent="shotPersonRightClick($event,scope.row,'lastTime')">
                 <commonMenu :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
               <div class="rightClickShadow" v-if="items.id==11&&scope.row.kf.length==1"
-                   @contextmenu.prevent="shotPersonRightClick2($event,scope.row,'customer')">
+                   @contextmenu.prevent="shotPersonRightClick($event,scope.row,'customer')">
                 <commonMenu :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
 
-              <div class="moreImg" @click="showMoreMenu2($event,scope.row,'sale')"
+              <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'sale')"
                    v-if="items.id==8&&scope.row.xs.length>1">
-                <commonMenu :menuData="menuData" v-show="scope.row.isShowSaleMenu"
+                <commonMenu :menuType="menuType" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
-              <div class="moreImg" @click="showMoreMenu2($event,scope.row,'lastTime')"
+              <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'lastTime')"
                    v-if="items.id==10&&scope.row.hq.length>1">
                 <commonMenu :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
-              <div class="moreImg" @click="showMoreMenu2($event,scope.row,'customer')"
+              <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'customer')"
                    v-if="items.id==11&&scope.row.kf.length>1">
                 <commonMenu :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
@@ -211,7 +211,9 @@
     moreSmallMenuLeft: 0,
 
     menuData: [],
+    menuType:'xs',
     shotMenuData: [],
+    rowObj:{},
     //表头数据
     colData: [
       {name: '操作', id: 1},
@@ -233,7 +235,7 @@
     tableData: [
       {
         date: '2016.05.02',
-        hotel: '（成都）丽思卡尔顿酒店',
+        hotel: '（成都）丽思卡尔顿酒店4444444444',
         hunQ: '喜来婚礼',
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
@@ -254,7 +256,7 @@
       },
       {
         date: '2016.05.02',
-        hotel: '（成都）丽思卡尔顿酒店',
+        hotel: '（成都）丽思卡尔顿酒店5555555555',
         hunQ: '喜来婚礼',
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
@@ -273,7 +275,7 @@
         isShowCustomerMenu: false,//客服
       }, {
         date: '2016.05.02',
-        hotel: '（成都）丽思卡尔顿酒店',
+        hotel: '（成都）丽思卡尔顿酒店6666666666',
         hunQ: '喜来婚礼',
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
@@ -449,24 +451,7 @@
       row.isShowCustomerMenu = false;
     },
 
-    showMoreMenu2(e, rowObj, type) {
-      if (type == 'sale') {
-        rowObj.isShowSaleMenu = true;
-        this.menuData = rowObj.xs;
-      } else if (type == 'lastTime') {
-        rowObj.isShowLastTimeMenu = true;
-        this.menuData = rowObj.hq;
-      } else if (type == 'customer') {
-        rowObj.isShowCustomerMenu = true;
-        this.menuData = rowObj.kf;
-      } else if (type == 'shot') {
-
-      }
-      this.moreSmallMenuTop = $(e.target).offset().top + 25 + 'px';
-      this.moreSmallMenuLeft = $(e.target).offset().left - 8 + 'px';
-    },
-
-    ///拍摄人员--更多图标点击显示更多菜单
+    //拍摄人员--更多图标点击和右击显示更多菜单
     showShotMoreMenu(e, rowObj, type) {
       rowObj.isShowShotMoreMenu = true;
       this.shotMenuData = rowObj.ps;
@@ -478,8 +463,27 @@
         this.moreShotMenuLeft = $(e.target).offset().left + 100 + 'px';
       }
     },
-    //拍摄人员--单元格的右击显示菜单
-    shotPersonRightClick2(e, rowObj, type) {
+
+    //销售等人员--更多图标点击显示更多菜单
+    showPersonMoreMenu(e, rowObj, type) {
+      this.rowObj=rowObj;
+      if (type == 'sale') {
+        rowObj.isShowSaleMenu = true;
+        this.menuData = rowObj.xs;
+      } else if (type == 'lastTime') {
+        rowObj.isShowLastTimeMenu = true;
+        this.menuData = rowObj.hq;
+      } else if (type == 'customer') {
+        rowObj.isShowCustomerMenu = true;
+        this.menuData = rowObj.kf;
+      }
+      this.moreSmallMenuTop = $(e.target).offset().top + 25 + 'px';
+      this.moreSmallMenuLeft = $(e.target).offset().left - 8 + 'px';
+    },
+
+    //销售等人员--单元格的右击显示菜单
+    shotPersonRightClick(e, rowObj, type) {
+      this.rowObj=rowObj;
       if (type == 'sale') {
         rowObj.isShowSaleMenu = true;
         this.menuData = rowObj.xs;
@@ -493,12 +497,7 @@
       this.moreSmallMenuTop = $(e.target).offset().top + 40 + 'px';
       this.moreSmallMenuLeft = $(e.target).offset().left + 40 + 'px';
     },
-    //拍摄人员--单元格的右击显示菜单
-    shotPersonRightClick(e, rowObj) {
-      rowObj.isShowMoreMenu = true;
-      this.moreMenuTop = $(e.target).offset().top + 40 + 'px';
-      this.moreMenuLeft = $(e.target).offset().left + 60 + 'px';
-    },
+
     //状态--单元格的右击显示菜单
     stateRightClick(e, rowObj) {
       rowObj.isShowRightMenu = true;
@@ -571,15 +570,17 @@
         template: `<div class="moreList">
             <ul>
                 <li v-for="(items,index) in menuData" v-if="index>0">{{items}}</li>
-                <li class="change" @click="changePerson">修改</li>
+                <li class="change" @click="changePerson($event,menuType)">修改</li>
             </ul>
          </div>`,
-        props: ['menuData'],
+        props: ['menuData','menuType'],
         data() {
           return {}
         },
         methods: {
-          changePerson() {
+          changePerson(e,type) {
+            console.log(e.target)
+            console.log(type)
             window.openPersonDiaLog();
           }
         }
