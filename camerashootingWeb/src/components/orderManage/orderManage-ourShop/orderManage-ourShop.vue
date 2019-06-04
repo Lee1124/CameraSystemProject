@@ -1,9 +1,12 @@
 <template>
   <div id="orderManageTable" ref="orderManageTable" :style="{opacity:orderManageTableOpacity}">
-    <div ref="tableBox" :class="['tableBox',{bigTableBox:bigTableBox}]">
+    <div ref="tableBox" :class="['tableBox']">
       <el-table
         :data="tableData"
         border
+        :summary-method="getSummaries"
+        show-summary
+        sum-text="合计："
         :height="tableHeight"
         :style="{border:0,borderTop:'1px solid #DDD'}"
         :header-row-class-name="headerClassName"
@@ -49,7 +52,6 @@
               <span>{{scope.row.date}}</span>
             </template>
           </el-table-column>
-
           <el-table-column
             :label="items.name"
             v-if="items.id==7"
@@ -59,7 +61,7 @@
             <template slot-scope=scope>
               <span>{{scope.row.zt}}</span>
               <div class="rightClickShadow" @contextmenu.prevent="rightClick($event,scope.row)"></div>
-              <div class="rightClickContent" v-show="scope.row.isShowRightMenu">
+              <div class="rightClickContent" :style="{top:menuTop,left:menuLeft}" v-show="scope.row.isShowRightMenu">
                 <ul>
                   <li>回馈表(已确认)</li>
                   <li>拍摄交接单(未填)</li>
@@ -71,21 +73,26 @@
 
           <el-table-column
             :label="items.name"
-
             v-if="items.id==9"
             sortable="custom"
             width="160"
             align="center">
             <template slot-scope=scope>
-              <span v-if="items.id==9">
-                <template v-for="(item2,index) in scope.row.ps">
-                  <span class="morePS" v-if="index<=1">{{item2}}<i>、</i></span>
-                </template>
-                <span class="moreImg" v-if="scope.row.ps.length>2"></span>
-                <span class="moreList">
+              <template v-for="(item2,index) in scope.row.ps">
+                <span class="morePS" v-if="index<=1">{{item2}}<i>、</i></span>
+              </template>
+              <div class="moreImg" @click="showMoreMenu($event,scope.row)" v-if="scope.row.ps.length>2">
+                <div class="moreList" v-show="scope.row.isShowMoreMenu" :style="{top:moreListTop,left:moreListLeft}"
+                     v-if="scope.row.ps.length>2">
+                  <ul>
+                    <template v-for="(item2,index) in scope.row.ps">
+                      <li v-if="index>1" v-text="item2"></li>
+                    </template>
+                    <li>修改</li>
+                  </ul>
+                </div>
+              </div>
 
-                </span>
-              </span>
             </template>
           </el-table-column>
 
@@ -108,7 +115,6 @@
     </div>
   </div>
 </template>
-
 <script>
   /*数据*/
   let dataObj = {
@@ -117,7 +123,10 @@
     tableBoxHeight: 0,
     tableHeight: 'auto',
     orderManageTableOpacity: 0,
-    bigTableBox: false,
+    menuTop: 0,
+    menuLeft: 0,
+    moreListTop: 0,
+    moreListLeft: 0,
     //表头数据
     colData: [
       {name: '操作', id: 1},
@@ -152,8 +161,10 @@
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
+        isShowMoreMenu: false,
         id: 1,
-      }, {
+      },
+      {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
         hunQ: '喜来婚礼',
@@ -164,10 +175,11 @@
         ps: ['小巫师', '周杰伦'],
         hq: '小娃',
         kf: '嘻嘻',
-        price: '1000',
+        price: '800',
         ht: '1000',
         isCQ: false,
         isShowRightMenu: false,
+        isShowMoreMenu: false,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -183,6 +195,7 @@
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
+        isShowMoreMenu: false,
       },
       {
         date: '2016.05.02',
@@ -199,6 +212,7 @@
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
+        isShowMoreMenu: false,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -214,6 +228,7 @@
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
+        isShowMoreMenu: false,
       },
       {
         date: '2016.05.02',
@@ -230,6 +245,7 @@
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
+        isShowMoreMenu: false,
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -245,7 +261,9 @@
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
-      }, {
+        isShowMoreMenu: false,
+      },
+      {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
         hunQ: '喜来婚礼',
@@ -260,6 +278,7 @@
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
+        isShowMoreMenu: false,
       },
       // {
       //   date: '2016.05.02',
@@ -344,13 +363,61 @@
   };
   /*方法*/
   let myMethods = {
+    //显示更多菜单
+    showMoreMenu(e, rowObj) {
+      rowObj.isShowMoreMenu = true;
+      this.moreListTop = $(e.target).offset().top + 25 + 'px';
+      this.moreListLeft = $(e.target).offset().left - 8 + 'px';
+    },
+    //获取合计
+    getSummaries(param) {
+      const {columns, data} = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计：';
+          return;
+        }
+        let values;
+        if (index == 11) {
+          values = data.map(item => Number(item.price));
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
+          sums[index] += 0;
+        }
+
+        if (index == 12) {
+          values = data.map(item => Number(item.ht));
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
+          sums[index] += 0;
+        }
+
+      });
+      return sums;
+    },
     //隐藏右击菜单
     hideRightClickMenu(row, column, cell, event) {
       row.isShowRightMenu = false;
+      row.isShowMoreMenu = false;
     },
     //右击事件
     rightClick(e, rowObj) {
       rowObj.isShowRightMenu = true;
+      this.menuTop = $(e.target).offset().top + 40 + 'px';
+      this.menuLeft = $(e.target).offset().left + 25 + 'px';
     },
     headerClassName({row, rowIndex}) {
       return 'orderTableHeaderStyle'
@@ -375,21 +442,13 @@
       this.orderManageTableBoxHeight = $(this.$refs.orderManageTable).height();
       this.tableBoxHeight = $(this.$refs.tableBox).height();
     },
-    //判断是否固定合计
+    //判断是否表格固定高度
     isFixedTotalTd() {
-      console.log(this.orderManageTableBoxHeight)
-      console.log(this.tableBoxHeight)
       if (this.tableBoxHeight >= this.orderManageTableBoxHeight) {
-        this.bigTableBox = true;
         this.tableHeight = this.tableBoxHeight;
-        console.log($('.orderTableRowStyle:last-of-type'))
-        $('.orderTableRowStyle:last-of-type').css({
-          position: 'fixed',
-          bottom: '30px',
-        });
       }
       this.orderManageTableOpacity = 1;
-    }
+    },
   };
   export default {
     name: "orderManageTable",
@@ -407,23 +466,6 @@
       })
     },
     mounted() {
-      //保存高度
-
-      this.tableData.push({
-        date: '',
-        hotel: '',
-        hunQ: '',
-        keHu: '',
-        xm: '',
-        zt: '',
-        xs: '',
-        ps: '',
-        hq: '',
-        kf: '',
-        price: '5000',
-        ht: '7000',
-        isHeJi: true
-      });
     }
   }
 </script>
@@ -470,13 +512,7 @@
   >>> .el-table--border::after, .el-table--group::after {
     height: auto;
     background: #DDD;
-    bottom: 45px;
-  }
-
-  .bigTableBox >>> .el-table--border::after, .el-table--group::after {
-    height: auto;
-    background: #DDD;
-    bottom: 0;
+    bottom: 54px;
   }
 
   >>> .orderTableHeaderStyle th {
@@ -515,47 +551,12 @@
     color: #5996F8;
   }
 
-  >>> .orderTableRowStyle:nth-last-child(2) td {
-    border-bottom: 1px solid #DDD;
-  }
-
-  >>> .orderTableRowStyle:nth-last-child(2) td .fillSpan {
-    border-bottom: 1px solid #DDD;
-  }
-
-  >>> .orderTableRowStyle:last-of-type td {
-    border: 0;
-    background: #F6F6F6;
-    color: #FF0000;
-    font-weight: 700;
-  }
-
   >>> .orderTableRowStyle td .fillSpan {
     position: absolute;
     height: 100%;
     width: 17px;
     top: 0;
     right: -17px;
-  }
-
-  >>> .orderTableRowStyle:last-of-type td .fillSpan {
-    display: none;
-  }
-
-  >>> .orderTableRowStyle:last-of-type td:first-of-type span {
-    margin-left: 10px;
-  }
-
-  .bigTableBox >>> .orderTableRowStyle:last-of-type td span {
-    margin-left: 20px;
-  }
-
-  .bigTableBox >>> .orderTableRowStyle:last-of-type td:first-of-type span {
-    margin-left: 0;
-  }
-
-  >>> .orderTableRowStyle:last-of-type td:first-of-type {
-    font-weight: 400;
   }
 
   >>> .orderTableRow1nStyle td {
@@ -583,9 +584,24 @@
     background: #F0F4FA !important;
   }
 
-  >>> .orderTableRowStyle:last-of-type:hover td {
-    background: #F6F6F6 !important;
+  /*>>> .orderTableRowStyle:last-of-type:hover td {*/
+  /*background: #F6F6F6 !important;*/
+  /*color: #FF0000;*/
+  /*}*/
+  >>> .el-table__footer-wrapper .has-gutter td {
+    background: #F6F6F6;
+    border-color: #F6F6F6;
     color: #FF0000;
+    font-weight: 700;
+  }
+
+  >>> .el-table__footer-wrapper .has-gutter td:first-of-type {
+    font-weight: 400;
+  }
+
+  >>> .el-table__footer-wrapper .has-gutter th.gutter {
+    background: #F6F6F6;
+    border: 0;
   }
 
   >>> .el-table .cell.el-tooltip {
@@ -607,12 +623,10 @@
     width: 120px;
     border: 1px solid rgba(220, 230, 245, 1);
     border-radius: 5px;
-    margin-left: 15px;
-    margin-top: 5px;
     padding: 10px 0;
   }
 
-  .rightClickContent::before {
+  .rightClickContent::before, .moreList::before {
     content: '';
     position: absolute;
     width: 8px;
@@ -660,5 +674,32 @@
 
   .moreImg:hover {
     background: url("../../../../static/img/order/more2.png") no-repeat center center;
+  }
+
+  .moreList {
+    position: fixed;
+    width: 58px;
+    z-index: 999;
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(220, 230, 245, 1);
+    border-radius: 5px;
+    font-size: 12px;
+    color: #808080;
+    padding: 6px 0;
+  }
+
+  .moreList li {
+    height: 24px;
+    line-height: 24px;
+  }
+
+  .moreList li:last-of-type {
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .moreList li:last-of-type:hover {
+    color: #5996F8;
+    text-decoration: underline;
   }
 </style>
