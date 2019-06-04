@@ -3,7 +3,7 @@
     <div class="personal-icon">
       <img src="static\img\setting\user.png">
       <el-button>更换头像</el-button>
-      <el-button class="change-psd">修改密码</el-button>
+      <el-button class="change-psd" @click="showPsdModal">修改密码</el-button>
     </div>
     <div class="personal-info">
       <span class="user-name">周杰伦</span>
@@ -15,28 +15,63 @@
       </div>
       <span class="user-info">入职：2018.05.17</span>
     </div>
+
+    <!--修改电话弹窗-->
     <el-dialog
       title="更换电话号码"
       :modal="dialogVisible"
       :visible.sync="dialogVisible"
       width="520px"
-      :modal-append-to-body="!dialogVisible"
+      :close-on-click-modal="false"
       :before-close="handleClose"
       :center="dialogVisible"
       custom-class="change-dialog"
-      class="aaa"
     >
       <div class="dialog-main">
-        <div>
-          <span class="user-info">原号码：13682459814</span>
+        <div class="input-phone">
           <div>
-            <span class="user-info span-new">新号码：</span>
+            <span class="span-new">原号码：</span>
+            <span class="old-phone">13682459814</span>
+          </div>
+          <div>
+            <span class="span-new">新号码：</span>
             <el-input class="new-phone" v-model="input" placeholder="请输入内容"></el-input>
           </div>
         </div>
         <div class="dialog-bottom">
-          <el-button type="text">取消</el-button>
-          <el-button>保存</el-button>
+          <el-button type="text" class="btn-cancel" @click="dialogVisible=false">取消</el-button>
+          <el-button class="btn-save">保存</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!--修改密码弹窗-->
+    <el-dialog
+      title="修改登录密码"
+      :modal="changePsw"
+      :visible.sync="changePsw"
+      width="520px"
+      :close-on-click-modal="false"
+      :before-close="handleClose"
+      :center="changePsw"
+      custom-class="change-dialog"
+    >
+      <div class="changePsw-main">
+        <div>
+          <span class="from-title">原密码：</span>
+          <el-input class="new-phone" v-model="input1" placeholder="输入原密码" show-password></el-input>
+        </div>
+        <div>
+          <span class="from-title">新密码：</span>
+          <el-input class="new-phone" v-model="input2" placeholder="输入新密码" show-password></el-input>
+        </div>
+        <div>
+          <span class="from-title">确认新密码：</span>
+          <el-input class="new-phone" v-model="input3" placeholder="再次输入新密码" show-password></el-input>
+        </div>
+        <div class="changePsw-bottom">
+          <el-button type="text" class="btn-cancel" @click="dialogVisible=false">取消</el-button>
+          <el-button class="btn-save">保存</el-button>
         </div>
       </div>
     </el-dialog>
@@ -45,7 +80,13 @@
 <script>
 export default {
   data() {
-    return { dialogVisible: false, input: "" };
+    return {
+      dialogVisible: false,
+      changePsw: false,
+      input1: "",
+      input2: "",
+      input3: ""
+    };
   },
   methods: {
     handleClose(done) {
@@ -53,6 +94,9 @@ export default {
     },
     changePhone() {
       this.dialogVisible = true;
+    },
+    showPsdModal() {
+      this.changePsw = true;
     }
   }
 };
@@ -138,7 +182,7 @@ export default {
 .phone-text {
   flex: 1;
 }
-/*弹窗样式*/
+/*弹窗样式 (修改电话)*/
 .change-dialog {
   width: 520px;
   height: 400px;
@@ -151,17 +195,84 @@ export default {
   border-radius: 5px;
 }
 
+.old-phone {
+  font-size: 14px;
+  color: #4c4c4c;
+  width: 184px;
+  display: inline-block;
+}
+
 .span-new {
   width: auto;
+  font-size: 14px;
+  color: #808080;
 }
 
 .dialog-bottom {
   float: right;
 }
 
+.btn-cancel {
+  background: transparent;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: #999999;
+}
+
 .dialog-main {
   width: 315px;
-  height: 225px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  height: 313px;
+  margin: auto;
+}
+
+.input-phone {
+  width: 100%;
+  height: 90px;
+  display: flex;
+  margin-top: 25px;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/*弹窗样式 (修改密码)*/
+.changePsw-main {
+  width: 345px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 50px auto 0;
+}
+
+.changePsw-main .from-title {
+  width: 90px;
+  display: inline-block;
+  text-align: right;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(128, 128, 128, 1);
+  line-height: 32px;
+}
+
+.changePsw-main .changePsw-bottom {
+  width: 100%;
+  height: 95px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.changePsw-main .changePsw-bottom .el-button{
+  margin:0 0 0 30px ;
 }
 </style>
 <style lang="scss">
@@ -171,7 +282,11 @@ export default {
   background: rgba(255, 255, 255, 1);
   box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
 }
-.el-dialog__title {
+
+.change-dialog .el-dialog__header {
+  padding-top: 35px;
+}
+.change-dialog .el-dialog__title {
   width: 101px;
   height: 18px;
   font-size: 17px;
@@ -181,21 +296,20 @@ export default {
   line-height: 26px;
 }
 
-.el-dialog__body {
+.change-dialog .el-dialog__body {
   padding: 0px !important;
 }
 
-.new-phone {
+.change-dialog .el-dialog__headerbtn {
+  top: 29px;
+  font-size: 25px;
+}
+
+.change-dialog .el-input__inner {
   width: 184px;
   height: 32px;
   border: none;
-  border-radius: 5px;
-}
-
-.el-input__inner {
-  width: 184px;
-  height: 32px;
-  border: 1px solid rgba(221, 221, 221, 1);
+  padding-left: 12px;
 }
 </style>
 

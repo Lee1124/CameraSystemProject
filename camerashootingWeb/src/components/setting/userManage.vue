@@ -150,8 +150,6 @@ export default {
       const parent = node.parent;
       const children = parent.data.children || parent.data;
       const index = children.findIndex(d => d.id === data.id);
-      console.log("node", node);
-      console.log("data", data);
       children.splice(index, 1);
     }
   }
