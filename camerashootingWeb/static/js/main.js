@@ -12,7 +12,7 @@ var cosIp = "https://xlfile-1256392453.file.myqcloud.com/";
 
 function getkevalue() {
   // var returnval = window.localStorage.userinfo;
-  var returnval = 'http://localhost/|1|2|xlhl|http://localhost:5819/|http://171.211.126.122:8092/|1,1|http://192.168.1.253:8095/|http://192.168.1.253:8092';
+  var returnval = 'http://localhost/|1|2|xlhl|http://localhost:5819/|http://171.211.126.122:8092/|1,1|http://192.168.1.253:8095/|http://192.168.1.79:8088';
   var vararry = returnval.split("|");
   var keyobj = new Object();
   keyobj.url = vararry[0]; //处理服务器ip   211.

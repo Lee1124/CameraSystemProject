@@ -1,19 +1,19 @@
 <template>
   <div class="personal-content">
     <div class="personal-icon">
-      <img src="static\img\setting\user.png">
+      <img :src="userInfo.ImgUrl">
       <el-button>更换头像</el-button>
       <el-button class="change-psd" @click="showPsdModal">修改密码</el-button>
     </div>
     <div class="personal-info">
-      <span class="user-name">周杰伦</span>
-      <span class="user-info">部门：销售部</span>
-      <span class="user-info">职位：助理</span>
+      <span class="user-name">{{userInfo.RealName}}</span>
+      <span class="user-info">部门：{{userInfo.DepartmentName}}</span>
+      <span class="user-info">职位：{{userInfo.DutyName}}</span>
       <div class="info-phone">
-        <span class="user-info phone-text">电话：13682459814</span>
+        <span class="user-info phone-text">电话：{{userInfo.Phone}}</span>
         <span class="user-info phone-change" @click="changePhone">更换</span>
       </div>
-      <span class="user-info">入职：2018.05.17</span>
+      <span class="user-info">入职：{{userInfo.AddTime}}</span>
     </div>
 
     <!--修改电话弹窗-->
@@ -32,16 +32,16 @@
         <div class="input-phone">
           <div>
             <span class="span-new">原号码：</span>
-            <span class="old-phone">13682459814</span>
+            <span class="old-phone">{{userInfo.Phone}}</span>
           </div>
           <div>
             <span class="span-new">新号码：</span>
-            <el-input class="new-phone" v-model="input1" placeholder="请输入内容"></el-input>
+            <el-input class="new-phone" v-model="newPhone" placeholder="请输入新号码"></el-input>
           </div>
         </div>
         <div class="dialog-bottom">
           <el-button type="text" class="btn-cancel" @click="dialogVisible=false">取消</el-button>
-          <el-button class="btn-save">保存</el-button>
+          <el-button class="btn-save" @click="updateUserBasicPhone">保存</el-button>
         </div>
       </div>
     </el-dialog>
@@ -61,19 +61,19 @@
       <div class="changePsw-main">
         <div>
           <span class="from-title">原密码：</span>
-          <el-input class="new-phone" v-model="input1" placeholder="输入原密码" show-password></el-input>
+          <el-input class="new-phone" v-model="oldPsw" placeholder="输入原密码" show-password></el-input>
         </div>
         <div>
           <span class="from-title">新密码：</span>
-          <el-input class="new-phone" v-model="input2" placeholder="输入新密码" show-password></el-input>
+          <el-input class="new-phone" v-model="newPsw" placeholder="输入新密码" show-password></el-input>
         </div>
         <div>
           <span class="from-title">确认新密码：</span>
-          <el-input class="new-phone" v-model="input3" placeholder="再次输入新密码" show-password></el-input>
+          <el-input class="new-phone" v-model="againPsd" placeholder="再次输入新密码" show-password></el-input>
         </div>
         <div class="changePsw-bottom">
-          <el-button type="text" class="btn-cancel" @click="dialogVisible=false">取消</el-button>
-          <el-button class="btn-save">保存</el-button>
+          <el-button type="text" class="btn-cancel" @click="changePsw=false">取消</el-button>
+          <el-button class="btn-save" @click="updateUserBasicPassword">保存</el-button>
         </div>
       </div>
     </el-dialog>
@@ -83,35 +83,117 @@
 export default {
   data() {
     return {
+      userInfo: {},
       dialogVisible: false,
       changePsw: false,
-      input1: "",
-      input2: "",
-      input3: ""
+      oldPsw: "",
+      newPsw: "",
+      againPsd: "",
+      newPhone: ""
     };
   },
   mounted() {
-    this.$Axios({
-      method: "POST",
-      url:"http://211.149.163.185:8090/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyUserInfoDetail",
-      data: { UserId: 1 },
-      success(res) {
-        console.log(res);
-      },
-      error(err) {
-        console.log(err);
-      }
-    });
+    this.getMyUserInfoDetail();
   },
   methods: {
+    /**
+     * 关闭弹窗
+     */
     handleClose(done) {
       done();
     },
+    /**
+     * 显示修改手机弹窗
+     */
     changePhone() {
+      this.newPhone = "";
       this.dialogVisible = true;
     },
+    /**
+     * 显示修改密码弹窗
+     */
     showPsdModal() {
+      this.oldPsw = "";
+      this.newPsw = "";
+      this.againPsd = "";
       this.changePsw = true;
+    },
+    /**
+     * 获取用户信息
+     */
+    getMyUserInfoDetail() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyUserInfoDetail`,
+        data: { UserId: 1 },
+        success(res) {
+          if (res.data.status) {
+            that.userInfo = res.data.data;
+          }
+        },
+        error(err) {
+          console.log(err);
+        }
+      });
+    },
+    /**
+     * 修改手机号码
+     */
+    updateUserBasicPhone() {
+      //进行手机号码格式验证  --未实现
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/UpdateUserBasicPhone`,
+        data: { UserId: 1, Phone: this.newPhone },
+        success(res) {
+          if (res.data.status) {
+            that.dialogVisible = false;
+            that.getMyUserInfoDetail();
+            alert("修改成功");
+          }
+        },
+        error(err) {
+          console.log(err);
+        }
+      });
+    },
+    /**
+     * 修改密码
+     */
+    updateUserBasicPassword() {
+      //进行密码验证  --未实现
+      if (this.newPsw != this.againPsd) {
+        alert("两次密码不一致");
+      } else {
+        let that = this;
+        this.$Axios({
+          method: "POST",
+          url: `${
+            getkevalue().apiurl
+          }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/UpdateUserBasicPassword`,
+          data: {
+            UserId: 1,
+            OldPassWord: this.oldPsw,
+            NewPassWord: this.newPsw
+          },
+          success(res) {
+            if (res.data.status) {
+              that.changePsw = false;
+              that.getMyUserInfoDetail();
+              alert("修改成功");
+            }
+          },
+          error(err) {
+            console.log(err);
+          }
+        });
+      }
     }
   }
 };
@@ -323,6 +405,13 @@ export default {
   width: 184px;
   height: 32px;
   padding-left: 12px;
+}
+
+/*设置页面弹窗居中*/
+.setting-content .el-dialog__wrapper {
+  position: absolute !important;
+  display: flex;
+  align-items: center;
 }
 </style>
 
