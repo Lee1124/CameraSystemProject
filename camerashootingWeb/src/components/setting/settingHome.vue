@@ -1,7 +1,7 @@
 <template>
   <div class="setting-content">
     <el-menu
-      default-active="user"
+      :default-active="activeItem"
       class="el-menu-demo noSelect noBorder"
       mode="horizontal"
       text-color="#1D213E"
@@ -29,7 +29,7 @@ export default {
   components: { Personal, UserManage, DepartManage,PostManage },
   data() {
     return {
-      activeItem: "user"
+      activeItem: "personal"
     };
   },
   methods: {

@@ -28,7 +28,7 @@
     <el-dialog
       title="编辑"
       :modal="false"
-      :top="0"
+      top="0"
       :visible.sync="showDepartDig"
       width="520px"
       :close-on-click-modal="false"

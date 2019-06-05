@@ -61,7 +61,7 @@
     <el-dialog
       title="新增员工"
       :modal="false"
-      :top="0"
+      top="0"
       :visible.sync="showAddDig"
       width="652px"
       :close-on-click-modal="false"
@@ -105,7 +105,7 @@
     <el-dialog
       title="删除提示"
       :modal="false"
-      :top="0"
+      top="0"
       :visible.sync="showDeletwDig"
       width="500px"
       :close-on-click-modal="false"
@@ -134,7 +134,7 @@
       :close-on-click-modal="false"
       :before-close="handleClose"
       :center="true"
-      :top="0"
+      top="0"
       custom-class="authority-dialog"
     >
       <div class="authority-main commonScrollStyle">
@@ -249,7 +249,7 @@ export default {
       iconStr: "iconStr",
       showAddDig: false,
       showDeletwDig: false,
-      showAutDig: true,
+      showAutDig: false,
       formInline: {
         user: "",
         region: ""
