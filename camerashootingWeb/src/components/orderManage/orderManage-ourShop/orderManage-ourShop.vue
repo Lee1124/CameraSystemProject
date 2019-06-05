@@ -85,16 +85,21 @@
               <template v-for="(item2,index) in scope.row.ps">
                 <span class="morePS" v-if="index<=1">{{item2}}<i>、</i></span>
               </template>
-              <span v-if="scope.row.ps.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
+              <span v-if="scope.row.ps.length==0"><a href="javascript:void(0)" class="commonColor"
+                                                     @click="openPersonDiaLog(scope.row)">添加</a></span>
               <div class="moreImg" @click="showShotMoreMenu($event,scope.row,'haveBtn')"
                    v-if="items.id==9&&scope.row.ps.length>2">
-                <commonMenu-shot :rowObj="rowObj" v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
-                                 :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
+                <transition name="slide-fade">
+                  <commonMenu-shot :rowObj="rowObj" v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
+                                   :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
+                </transition>
               </div>
               <div class="rightClickShadow" v-if="items.id==9&&scope.row.ps.length<=2&&scope.row.ps.length!=0"
                    @contextmenu.prevent="showShotMoreMenu($event,scope.row,'noBtn')">
-                <commonMenu-shot :rowObj="rowObj" v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
-                                 :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
+                <transition name="slide-fade">
+                  <commonMenu-shot :rowObj="rowObj" v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
+                                   :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
+                </transition>
               </div>
 
             </template>
@@ -111,50 +116,65 @@
                 <template v-for="(items,index) in scope.row.xs">
                   <span v-if="index<1">{{items}}</span>
                 </template>
-                <span v-if="scope.row.xs.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
+                <span v-if="scope.row.xs.length==0"><a href="javascript:void(0)" class="commonColor"
+                                                       @click="openPersonDiaLog(scope.row)">添加</a></span>
               </span>
               <span v-if="items.id==10">
                  <template v-for="(items,index) in scope.row.hq">
                   <span v-if="index<1">{{items}}</span>
                 </template>
-                <span v-if="scope.row.hq.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
+                <span v-if="scope.row.hq.length==0"><a href="javascript:void(0)" class="commonColor"
+                                                       @click="openPersonDiaLog(scope.row)">添加</a></span>
               </span>
               <span v-if="items.id==11">
               <template v-for="(items,index) in scope.row.kf">
                   <span v-if="index<1">{{items}}</span>
                 </template>
-                <span v-if="scope.row.kf.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
+                <span v-if="scope.row.kf.length==0"><a href="javascript:void(0)" class="commonColor"
+                                                       @click="openPersonDiaLog(scope.row)">添加</a></span>
               </span>
               <div class="rightClickShadow" v-if="items.id==8&&scope.row.xs.length==1"
                    @contextmenu.prevent="shotPersonRightClick($event,scope.row,'sale')">
-                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
-                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                <transition name="slide-fade">
+                  <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
+                              :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                </transition>
               </div>
               <div class="rightClickShadow" v-if="items.id==10&&scope.row.hq.length==1"
                    @contextmenu.prevent="shotPersonRightClick($event,scope.row,'lastTime')">
-                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
-                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                <transition name="slide-fade">
+                  <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
+                              :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                </transition>
               </div>
               <div class="rightClickShadow" v-if="items.id==11&&scope.row.kf.length==1"
                    @contextmenu.prevent="shotPersonRightClick($event,scope.row,'customer')">
+                <transition name="slide-fade"></transition>
                 <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
 
               <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'sale')"
                    v-if="items.id==8&&scope.row.xs.length>1">
-                <commonMenu :rowObj="rowObj" :menuType="menuType" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
-                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                <transition name="slide-fade">
+                  <commonMenu :rowObj="rowObj" :menuType="menuType" :menuData="menuData"
+                              v-show="scope.row.isShowSaleMenu"
+                              :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                </transition>
               </div>
               <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'lastTime')"
                    v-if="items.id==10&&scope.row.hq.length>1">
-                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
-                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                <transition name="slide-fade">
+                  <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
+                              :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                </transition>
               </div>
               <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'customer')"
                    v-if="items.id==11&&scope.row.kf.length>1">
-                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
-                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                <transition name="slide-fade">
+                  <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
+                              :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+                </transition>
               </div>
             </template>
           </el-table-column>
@@ -194,7 +214,7 @@
   /*数据*/
   let dataObj = {
     //弹框数据
-    showPersonManageDiaLog:false,
+    showPersonManageDiaLog: false,
 
     //表格的最外层高度
     orderManageTableBoxHeight: 0,
@@ -209,9 +229,9 @@
     moreSmallMenuLeft: 0,
 
     menuData: [],
-    menuType:'xs',
+    menuType: 'xs',
     shotMenuData: [],
-    rowObj:{},
+    rowObj: {},
     //表头数据
     colData: [
       {name: '操作', id: 1},
@@ -394,14 +414,14 @@
   /*方法*/
   let myMethods = {
     //打开人员安排弹框
-    openPersonDiaLog(rowObj){
+    openPersonDiaLog(rowObj) {
       console.log(rowObj)
-      this.rowObj=rowObj;
-      this.showPersonManageDiaLog=true;
+      this.rowObj = rowObj;
+      this.showPersonManageDiaLog = true;
     },
     //关闭弹框
-    closeDialog(){
-      this.showPersonManageDiaLog=false;
+    closeDialog() {
+      this.showPersonManageDiaLog = false;
     },
     //获取合计
     getSummaries(param) {
@@ -453,7 +473,7 @@
 
     //拍摄人员--更多图标点击和右击显示更多菜单
     showShotMoreMenu(e, rowObj, type) {
-      this.rowObj=rowObj;
+      this.rowObj = rowObj;
       rowObj.isShowShotMoreMenu = true;
       this.shotMenuData = rowObj.ps;
       if (type == 'haveBtn') {
@@ -467,7 +487,7 @@
 
     //销售等人员--更多图标点击显示更多菜单
     showPersonMoreMenu(e, rowObj, type) {
-      this.rowObj=rowObj;
+      this.rowObj = rowObj;
       if (type == 'sale') {
         rowObj.isShowSaleMenu = true;
         this.menuData = rowObj.xs;
@@ -484,7 +504,7 @@
 
     //销售等人员--单元格的右击显示菜单
     shotPersonRightClick(e, rowObj, type) {
-      this.rowObj=rowObj;
+      this.rowObj = rowObj;
       if (type == 'sale') {
         rowObj.isShowSaleMenu = true;
         this.menuData = rowObj.xs;
@@ -543,7 +563,7 @@
     },
     methods: myMethods,
     created() {
-      window.openPersonDiaLog=this.openPersonDiaLog;
+      window.openPersonDiaLog = this.openPersonDiaLog;
       this.loadResize();
       this.$nextTick(() => {
         setTimeout(() => {
@@ -562,7 +582,7 @@
                 <li class="change" @click="changePerson($event)">修改</li>
             </ul>
          </div>`,
-        props: ['shotMenuData','rowObj'],
+        props: ['shotMenuData', 'rowObj'],
         data() {
           return {
             changePerson(e) {
@@ -578,7 +598,7 @@
                 <li class="change" @click="changePerson($event)">修改</li>
             </ul>
          </div>`,
-        props: ['menuData','rowObj'],
+        props: ['menuData', 'rowObj'],
         data() {
           return {}
         },
@@ -616,6 +636,16 @@
   >>> .moreList ul li.change:hover {
     text-decoration: underline;
     color: #5996F8;
+  }
+
+  /*======动画======*/
+  .slide-fade-enter-active, .slide-fade-leave-active {
+    transition: all .2s;
+  }
+
+  .slide-fade-enter, .slide-fade-leave-to {
+    opacity: 0;
+    height: 0;
   }
 
 

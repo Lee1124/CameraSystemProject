@@ -1,5 +1,5 @@
 <template>
-    <div id="">
+    <div id="orderNav">
 
     </div>
 </template>
@@ -10,7 +10,7 @@
     /*方法*/
     let myMethods = {};
     export default {
-        name: "",
+        name: "orderNav",
         data() {
             return dataObj;
         },
