@@ -261,6 +261,11 @@ export default {
   font-weight: bold;
   color: #4c4c4c;
 }
+.item-top img {
+  max-width: 18px;
+  max-height: 17px;
+  cursor: pointer;
+}
 
 .delete-tip {
   margin-left: 88px;

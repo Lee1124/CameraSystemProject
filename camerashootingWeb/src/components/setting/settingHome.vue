@@ -1,7 +1,7 @@
 <template>
   <div class="setting-content">
     <el-menu
-      :default-active="activeItem"
+      default-active="personal"
       class="el-menu-demo noSelect noBorder"
       mode="horizontal"
       text-color="#1D213E"
