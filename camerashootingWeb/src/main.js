@@ -161,10 +161,6 @@ function request(param) {
 // });*/
 
 
-/**
- * 设置localStorage失效时间
- *
- */
 
 
 
