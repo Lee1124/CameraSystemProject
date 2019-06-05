@@ -7,7 +7,16 @@
         <el-button class="button-add">新增</el-button>
       </div>
     </div>
-    <el-tree :data="data" node-key="id" default-expand-all :indent="40">
+    <el-tree
+      :data="data"
+      node-key="id"
+      :expand-on-click-node="false"
+      default-expand-all
+      :indent="40"
+      @node-collapse="iconStr='iconStr2'"
+      @node-expand="iconStr='iconStr'"
+      visible-arrow="false"
+    >
       <div slot-scope="{ node,data }">
         <div v-if="data.isStaff" class="user-children">
           <div class="user-info">
@@ -15,12 +24,27 @@
             <span>{{node.label}}</span>
           </div>
           <div class="user-info" v-for="staff in data.otherStaff">
-            <img :src="staff.icon">
-            <div>
-              <span class="staff-post">{{staff.post}}</span>
-              <span v-show="staff.post&&staff.post!=''">.</span>
-              <span>{{staff.name}}</span>
-            </div>
+            <el-popover
+              placement="right-start"
+              width="102"
+              trigger="manual"
+              popper-class="operate-popover"
+              v-model="staff.showOperate"
+            >
+              <div class="popover-main noSelect">
+                <span @click="editMoadl">编辑资料</span>
+                <span @click="powerMoadl">权限设置</span>
+                <span @click="deleteMoadl">删除人员</span>
+              </div>
+              <div slot="reference" @click="selectStaff(staff,data)">
+                <img :src="staff.icon">
+                <div>
+                  <span class="staff-post">{{staff.post}}</span>
+                  <span v-show="staff.post&&staff.post!=''">.</span>
+                  <span>{{staff.name}}</span>
+                </div>
+              </div>
+            </el-popover>
           </div>
         </div>
         <div v-else>
@@ -32,6 +56,19 @@
         </div>
       </div>
     </el-tree>
+    <!--新增人员弹窗-->
+    <el-dialog
+      title="新增员工"
+      :modal="false"
+      :visible.sync="showAddDig"
+      width="652px"
+      :close-on-click-modal="false"
+      :before-close="handleClose"
+      :center="true"
+      custom-class="add-dialog"
+    >
+      <div class="changePsw-main"></div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -59,18 +96,21 @@ export default {
                       id: 4,
                       name: "刘德华",
                       post: "总监",
+                      showOperate: false,
                       icon: "static\\img\\setting\\user.png"
                     },
                     {
                       id: 5,
                       name: "周杰伦",
                       post: "",
+                      showOperate: false,
                       icon: "static\\img\\setting\\user.png"
                     },
                     {
                       id: 6,
                       name: "何泓姗",
                       post: "",
+                      showOperate: false,
                       icon: "static\\img\\setting\\user.png"
                     }
                   ]
@@ -91,24 +131,28 @@ export default {
                       id: 8,
                       name: "王谦",
                       post: "总监",
+                      showOperate: false,
                       icon: "static\\img\\setting\\user.png"
                     },
                     {
                       id: 9,
                       name: "胡歌",
                       post: "",
+                      showOperate: false,
                       icon: "static\\img\\setting\\user.png"
                     },
                     {
                       id: 10,
                       name: "张碧晨",
                       post: "",
+                      showOperate: false,
                       icon: "static\\img\\setting\\user.png"
                     },
                     {
                       id: 11,
                       name: "易烊千玺",
                       post: "",
+                      showOperate: false,
                       icon: "static\\img\\setting\\user.png"
                     }
                   ]
@@ -118,7 +162,11 @@ export default {
           ]
         }
       ],
-      searchStr: ""
+      searchStr: "",
+      curStaff: { id: 0 },
+      showOperate: false,
+      iconStr: "iconStr",
+      showAddDig: false
     };
   },
   computed: {
@@ -151,6 +199,68 @@ export default {
       const children = parent.data.children || parent.data;
       const index = children.findIndex(d => d.id === data.id);
       children.splice(index, 1);
+    },
+
+    /**
+     * 选择某个员工
+     */
+    selectStaff(staff, data) {
+      let staffList = {};
+
+      this.data[0].children.forEach(d => {
+        if (d.children[0].id == data.id) {
+          staffList = d.children[0];
+        }
+      });
+      if (staffList) {
+        let staffInfo = staffList.otherStaff.find(s => s.id == staff.id);
+        if (staffInfo) {
+          if (!staffInfo.showOperate) {
+            this.hideAll();
+            this.curStaff = staffInfo;
+          }
+          staffInfo.showOperate = !staffInfo.showOperate;
+        }
+      }
+    },
+    /**
+     * 隐藏所有弹出框
+     */
+    hideAll() {
+      let data = this.data[0];
+      data.children.forEach(department => {
+        department.children[0].otherStaff.forEach(staff => {
+          staff.showOperate = false;
+        });
+      });
+    },
+    /**
+     * 显示编辑资料弹窗
+     */
+    editMoadl() {
+      console.log("编辑资料", this.curStaff.name);
+      this.hideAll();
+      this.showAddDig = true;
+    },
+    /**
+     * 显示权限弹窗
+     */
+    powerMoadl() {
+      console.log("权限", this.curStaff.name);
+      this.hideAll();
+    },
+    /**
+     * 显示删除人员弹窗
+     */
+    deleteMoadl() {
+      console.log("删除人员", this.curStaff.name);
+      this.hideAll();
+    },
+    /**
+     * 关闭弹窗
+     */
+    handleClose(done) {
+      done();
     }
   }
 };
@@ -258,6 +368,38 @@ export default {
   height: 70px;
   border-radius: 50%;
 }
+
+/*弹出框样式*/
+.popover-main {
+  padding: 15px 0;
+  border: 1px solid rgba(154, 182, 228, 1);
+  border-radius: 5px;
+}
+
+.popover-main span {
+  width: 96px;
+  height: 38px;
+  display: inline-block;
+  background: transparent;
+  color: #4c4c4c;
+  margin-left: 2px;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  line-height: 38px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.popover-main span:hover {
+  background: #ebf1fb;
+  color: #5996f8;
+}
+
+/*弹窗样式*/
+.add-dialog {
+  width: 652px;
+  height: 565px;
+}
 </style>
 
 <!--无scoped 覆盖框架默认样式-->
@@ -266,6 +408,21 @@ export default {
   height: auto !important;
   background: transparent !important;
   padding: 13px 20px 13px 45px;
+}
+.el-popover,
+.el-popper {
+  margin: 0 !important;
+  padding: 0;
+  min-width: 102px;
+}
+.el-popper .popper__arrow {
+  border-right-color: rgba(154, 182, 228, 1) !important;
+}
+.iconStr {
+  background-image: url("/static/img/setting/tree1.png");
+}
+.iconStr2 {
+  background-image: url("/static/img/setting/tree2.png");
 }
 </style>
 

@@ -35,7 +35,7 @@
           </div>
           <div>
             <span class="span-new">新号码：</span>
-            <el-input class="new-phone" v-model="input" placeholder="请输入内容"></el-input>
+            <el-input class="new-phone" v-model="input1" placeholder="请输入内容"></el-input>
           </div>
         </div>
         <div class="dialog-bottom">
