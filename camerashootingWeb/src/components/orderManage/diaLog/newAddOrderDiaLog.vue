@@ -3,7 +3,7 @@
     <el-dialog
       :title="diaLogObj.title"
       :visible.sync="diaLogObj.showDiaLog"
-      custom-class="dialogBox2"
+      custom-class="dialogBox2 commonDiaLog"
       :modal="false"
       :before-close="closeBefore"
       :width="diaLogObj.diaLogWidth"
@@ -85,20 +85,10 @@
     height: 100%;
   }
 
-  >>> .dialogBox2 {
-    margin: 0!important;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%,-50%);
-    -moz-transform: translate(-50%,-50%);
-    -ms-transform: translate(-50%,-50%);
-    -o-transform: translate(-50%,-50%);
-    transform: translate(-50%,-50%);
-  }
   >>> .el-dialog__footer {
     position: absolute;
     left: 50%;
-    bottom: 40px;
+    bottom: 35px;
     -webkit-transform: translateX(-50%);
     -moz-transform: translateX(-50%);
     -ms-transform: translateX(-50%);

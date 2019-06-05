@@ -3,55 +3,14 @@ import App from './App';
 import router from './router';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-
-
-//全局前置导航守卫
-router.beforeEach((to, from, next) => { //全局前置守卫按照创建顺序调用
-  if (to.path == '/login') {
-    next();
-  } else {
-    if (sessionStorage.getItem('login')) {
-      next();
-    } else {
-      next({path: '/login'});
-    }
-  }
-});
-
-
-// import preview from 'vue-photo-preview'
-// import 'vue-photo-preview/dist/skin.css'
-// Vue.use(preview);
 import Axios from 'axios';
 
-// import store from './storeall/store'
 Vue.use(ElementUI);
 
-Vue.config.productionTip = false;
 // Axios.defaults.baseURL = 'https://xilai99.com/';
+Vue.config.productionTip = false;
 Vue.prototype.$axios = Axios;
-// Vue.prototype.$store = store;
-
 Vue.prototype.$Axios = request;//封装axios请求
-
-//自定义指令1
-Vue.directive('marginRight', {
-  bind(el, binding) {
-    el.style.marginRight = parseInt(binding.value) + 'px'
-  }
-});
-//自定义指令2
-Vue.directive('myHeight', {
-  bind(el, binding) {
-    el.style.height = parseInt(binding.value) + 'px'
-  }
-});
-//自定义指令3
-Vue.directive('focus', {
-  inserted(el,) {
-    el.focus();
-  }
-});
 
 //注册组件:
 import dropSelect from './components/calendar/dropSelect'
@@ -72,6 +31,38 @@ Vue.component('personManageDiaLog', personManageDiaLog);
 //     })
 //   }
 // });
+
+//自定义指令1
+Vue.directive('marginRight', {
+  bind(el, binding) {
+    el.style.marginRight = parseInt(binding.value) + 'px'
+  }
+});
+//自定义指令2
+Vue.directive('myHeight', {
+  bind(el, binding) {
+    el.style.height = parseInt(binding.value) + 'px'
+  }
+});
+//自定义指令3
+Vue.directive('focus', {
+  inserted(el,) {
+    el.focus();
+  }
+});
+
+//全局前置导航守卫
+router.beforeEach((to, from, next) => { //全局前置守卫按照创建顺序调用
+  if (to.path == '/login') {
+    next();
+  } else {
+    if (sessionStorage.getItem('login')) {
+      next();
+    } else {
+      next({path: '/login'});
+    }
+  }
+});
 
 /* eslint-disable no-new */
 var vm = new Vue({
@@ -95,7 +86,7 @@ function sessionStorageLose(hour) {
     alert('登陆过期，请重新登陆');
     sessionStorage.removeItem('login');
     sessionStorage.removeItem('loginTime');
-    vm.$router.push({path:'/login'});
+    vm.$router.push({path: '/login'});
   }
 }
 
@@ -132,7 +123,6 @@ function request(param) {
       param.error(err);
     });
   } else if (method == 'POST') {
-    console.log(this)
     this.$axios({
       method: method,
       url: url,
@@ -149,7 +139,7 @@ function request(param) {
 }
 
 /*封装请求调用方式*/
-// this.request({
+// this.$Axios({
 //   method:'POST',
 //   url:url,
 //   data:data,
