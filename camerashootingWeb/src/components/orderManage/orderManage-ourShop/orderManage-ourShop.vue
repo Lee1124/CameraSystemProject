@@ -28,9 +28,6 @@
               <span v-if="items.id==3">{{scope.row.hotel}}</span>
               <span v-if="items.id==4">{{scope.row.hunQ}}</span>
               <span v-if="items.id==5">{{scope.row.keHu}}</span>
-              <!--<span v-if="items.id==8">{{scope.row.xs}}</span>-->
-              <!--<span v-if="items.id==10">{{scope.row.hq}}</span>-->
-              <!--<span v-if="items.id==11">{{scope.row.kf}}</span>-->
             </template>
           </el-table-column>
 
@@ -41,7 +38,7 @@
             width="80"
             align="center">
             <template slot-scope=scope>
-              <span v-if="items.id==1&&scope.row.isHeJi==undefined"><a href="#">详情</a></span>
+              <span v-if="items.id==1&&scope.row.isHeJi==undefined"><a href="javascript:void(0)">详情</a></span>
               <span v-if="items.id==1&&scope.row.isHeJi">合计：</span>
             </template>
           </el-table-column>
@@ -57,6 +54,7 @@
               <span>{{scope.row.date}}</span>
             </template>
           </el-table-column>
+
           <el-table-column
             :label="items.name"
             v-if="items.id==7"
@@ -87,15 +85,15 @@
               <template v-for="(item2,index) in scope.row.ps">
                 <span class="morePS" v-if="index<=1">{{item2}}<i>、</i></span>
               </template>
+              <span v-if="scope.row.ps.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
               <div class="moreImg" @click="showShotMoreMenu($event,scope.row,'haveBtn')"
                    v-if="items.id==9&&scope.row.ps.length>2">
-                <commonMenu-shot v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
+                <commonMenu-shot :rowObj="rowObj" v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
                                  :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
               </div>
-
-              <div class="rightClickShadow" v-if="items.id==9&&scope.row.ps.length<=2"
+              <div class="rightClickShadow" v-if="items.id==9&&scope.row.ps.length<=2&&scope.row.ps.length!=0"
                    @contextmenu.prevent="showShotMoreMenu($event,scope.row,'noBtn')">
-                <commonMenu-shot v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
+                <commonMenu-shot :rowObj="rowObj" v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
                                  :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
               </div>
 
@@ -113,49 +111,49 @@
                 <template v-for="(items,index) in scope.row.xs">
                   <span v-if="index<1">{{items}}</span>
                 </template>
-                <span v-if="scope.row.xs.length==0"><a href="#" class="commonColor">添加</a></span>
+                <span v-if="scope.row.xs.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
               </span>
               <span v-if="items.id==10">
                  <template v-for="(items,index) in scope.row.hq">
                   <span v-if="index<1">{{items}}</span>
                 </template>
-                <span v-if="scope.row.hq.length==0"><a href="#" class="commonColor">添加</a></span>
+                <span v-if="scope.row.hq.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
               </span>
               <span v-if="items.id==11">
               <template v-for="(items,index) in scope.row.kf">
                   <span v-if="index<1">{{items}}</span>
                 </template>
-                <span v-if="scope.row.kf.length==0"><a href="#" class="commonColor">添加</a></span>
+                <span v-if="scope.row.kf.length==0"><a href="javascript:void(0)" class="commonColor" @click="openPersonDiaLog(scope.row)">添加</a></span>
               </span>
               <div class="rightClickShadow" v-if="items.id==8&&scope.row.xs.length==1"
                    @contextmenu.prevent="shotPersonRightClick($event,scope.row,'sale')">
-                <commonMenu :menuData="menuData" v-show="scope.row.isShowSaleMenu"
+                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
               <div class="rightClickShadow" v-if="items.id==10&&scope.row.hq.length==1"
                    @contextmenu.prevent="shotPersonRightClick($event,scope.row,'lastTime')">
-                <commonMenu :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
+                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
               <div class="rightClickShadow" v-if="items.id==11&&scope.row.kf.length==1"
                    @contextmenu.prevent="shotPersonRightClick($event,scope.row,'customer')">
-                <commonMenu :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
+                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
 
               <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'sale')"
                    v-if="items.id==8&&scope.row.xs.length>1">
-                <commonMenu :menuType="menuType" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
+                <commonMenu :rowObj="rowObj" :menuType="menuType" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
               <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'lastTime')"
                    v-if="items.id==10&&scope.row.hq.length>1">
-                <commonMenu :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
+                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
               <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'customer')"
                    v-if="items.id==11&&scope.row.kf.length>1">
-                <commonMenu :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
+                <commonMenu :rowObj="rowObj" :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
                             :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
               </div>
             </template>
@@ -301,7 +299,7 @@
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
         xs: ['小花', '周杰伦'],
-        ps: ['小巫师', '周杰伦', '哈哈哈'],
+        ps: [],
         hq: ['小花'],
         kf: ['小花'],
         price: '1000',
@@ -396,7 +394,9 @@
   /*方法*/
   let myMethods = {
     //打开人员安排弹框
-    openPersonDiaLog(){
+    openPersonDiaLog(rowObj){
+      console.log(rowObj)
+      this.rowObj=rowObj;
       this.showPersonManageDiaLog=true;
     },
     //关闭弹框
@@ -453,6 +453,7 @@
 
     //拍摄人员--更多图标点击和右击显示更多菜单
     showShotMoreMenu(e, rowObj, type) {
+      this.rowObj=rowObj;
       rowObj.isShowShotMoreMenu = true;
       this.shotMenuData = rowObj.ps;
       if (type == 'haveBtn') {
@@ -558,30 +559,32 @@
         template: `<div class="moreList">
             <ul>
                 <li v-for="(items,index) in shotMenuData" v-if="index>1">{{items}}</li>
-                <li class="change">修改</li>
+                <li class="change" @click="changePerson($event)">修改</li>
             </ul>
          </div>`,
-        props: ['shotMenuData'],
+        props: ['shotMenuData','rowObj'],
         data() {
-          return {}
+          return {
+            changePerson(e) {
+              window.openPersonDiaLog(this.rowObj);
+            }
+          }
         }
       },
       'commonMenu': {
         template: `<div class="moreList">
             <ul>
                 <li v-for="(items,index) in menuData" v-if="index>0">{{items}}</li>
-                <li class="change" @click="changePerson($event,menuType)">修改</li>
+                <li class="change" @click="changePerson($event)">修改</li>
             </ul>
          </div>`,
-        props: ['menuData','menuType'],
+        props: ['menuData','rowObj'],
         data() {
           return {}
         },
         methods: {
-          changePerson(e,type) {
-            console.log(e.target)
-            console.log(type)
-            window.openPersonDiaLog();
+          changePerson(e) {
+            window.openPersonDiaLog(this.rowObj);
           }
         }
       },
