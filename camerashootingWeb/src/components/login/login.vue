@@ -59,6 +59,17 @@
       document.title='用户登录-摄像'
     },
     mounted() {
+      this.$Axios({
+        method: "POST",
+        url:"http://211.149.163.185:8090/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyUserInfoDetail",
+        data: { UserId: 1 },
+        success(res) {
+          console.log(res);
+        },
+        error(err) {
+          console.log(err);
+        }
+      });
     },
     watch: {}
   }

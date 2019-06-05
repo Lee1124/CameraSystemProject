@@ -29,7 +29,7 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false;
 // Axios.defaults.baseURL = 'https://xilai99.com/';
-// Vue.prototype.$axios = Axios;
+Vue.prototype.$axios = Axios;
 // Vue.prototype.$store = store;
 
 Vue.prototype.$Axios = request;//封装axios请求
@@ -132,6 +132,7 @@ function request(param) {
       param.error(err);
     });
   } else if (method == 'POST') {
+    console.log(this)
     this.$axios({
       method: method,
       url: url,
