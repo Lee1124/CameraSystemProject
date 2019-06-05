@@ -54,17 +54,21 @@
               </div>
             </li>
 
-            <li class="form-inner"> </li>
-            <li class="form-inner"> </li>
+            <li class="form-inner"></li>
+            <li class="form-inner"></li>
             <li class="form-inner">
               <label>来源：</label>
               <span class="checkBox">
-                <el-checkbox v-model="checked">微博微信咨询</el-checkbox>
-                <el-checkbox v-model="checked">合作伙伴推荐</el-checkbox>
-                <el-checkbox v-model="checked">网其他</el-checkbox>
+                <template v-for="(items,index) in checkboxData">
+                    <el-checkbox v-model="items.isChecked" v-cloak>{{items.name}}</el-checkbox>
+                </template>
               </span>
             </li>
-            <li class="form-inner"> </li>
+            <li class="form-inner">
+              <div class="textArea">
+                <textarea name="" id="" ></textarea>
+              </div>
+            </li>
           </ul>
         </div>
         <!--/新增-->
@@ -92,6 +96,11 @@
       btn1Text: '',
       btn2Text: '',
     },
+    checkboxData: [
+      {name: '微博微信咨询', isChecked: false, id: 1},
+      {name: '合作伙伴推荐', isChecked: false, id: 2},
+      {name: '其他', isChecked: false, id: 3},
+    ],
     isShowSelectType: false,//显示选择类型内容
     isShowAddNewOrder: false,//显示选择类型内容
     checked: true
@@ -316,26 +325,28 @@
     /*float: left;*/
     /*margin-right: 70px;*/
   }
+
   .addNewOrder .form li:nth-of-type(5) {
     justify-content: flex-start;
   }
-
 
   .addNewOrder .form li label {
     color: #808080;
     font-size: 14px;
   }
+
   .addNewOrder .form li input {
-    width:200px;
-    height:32px;
-    border:1px solid rgba(221,221,221,1);
-    border-radius:4px;
+    width: 200px;
+    height: 32px;
+    border: 1px solid rgba(221, 221, 221, 1);
+    border-radius: 4px;
     padding: 0 15px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     color: #4C4C4C;
   }
+
   .addNewOrder .form li input::-webkit-input-placeholder {
     color: #BBB;
   }
@@ -344,6 +355,13 @@
     margin-left: 5px;
   }
 
+  .addNewOrder >>> .el-checkbox {
+    margin-right: 22px;
+  }
+  .addNewOrder .textArea{
+    border:1px solid rgba(221,221,221,1);
+    border-radius:4px;
+  }
 
 
 </style>
