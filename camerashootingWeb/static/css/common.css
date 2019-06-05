@@ -119,5 +119,7 @@ html, body {
 /*弹框通用样式*/
 .el-dialog__wrapper {
   position: absolute!important;
+  display: flex;
+  align-items: center;
 }
 

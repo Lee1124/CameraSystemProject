@@ -1,7 +1,7 @@
 <template>
   <div class="setting-content">
     <el-menu
-      default-active="post"
+      default-active="user"
       class="el-menu-demo noSelect noBorder"
       mode="horizontal"
       text-color="#1D213E"
@@ -14,10 +14,10 @@
       <el-menu-item index="post">岗位设置</el-menu-item>
       <el-menu-item index="other">其他参数</el-menu-item>
     </el-menu>
-    <Personal v-show="activeItem=='personal'"></Personal>
-    <UserManage v-show="activeItem=='user'"></UserManage>
-    <DepartManage v-show="activeItem=='depart'"></DepartManage>
-    <PostManage v-show="activeItem=='post'"></PostManage>
+    <Personal v-if="activeItem=='personal'"></Personal>
+    <UserManage v-if="activeItem=='user'"></UserManage>
+    <DepartManage v-if="activeItem=='depart'"></DepartManage>
+    <PostManage v-if="activeItem=='post'"></PostManage>
   </div>
 </template>
 <script>
@@ -29,7 +29,7 @@ export default {
   components: { Personal, UserManage, DepartManage,PostManage },
   data() {
     return {
-      activeItem: "post"
+      activeItem: "user"
     };
   },
   methods: {

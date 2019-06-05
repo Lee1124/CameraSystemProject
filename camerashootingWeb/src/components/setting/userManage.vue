@@ -1,5 +1,5 @@
 <template>
-  <div class="user-content">
+  <div class="user-content commonScrollStyle">
     <div class="div-search">
       <el-input placeholder="搜索人员" v-model="searchStr"></el-input>
       <div>
@@ -40,7 +40,7 @@
                 <img :src="staff.icon">
                 <div>
                   <span class="staff-post">{{staff.post}}</span>
-                  <span v-show="staff.post&&staff.post!=''">.</span>
+                  <span v-show="staff.post&&staff.post!=''">•</span>
                   <span>{{staff.name}}</span>
                 </div>
               </div>
@@ -56,10 +56,12 @@
         </div>
       </div>
     </el-tree>
+
     <!--新增人员弹窗-->
     <el-dialog
       title="新增员工"
       :modal="false"
+      :top="0"
       :visible.sync="showAddDig"
       width="652px"
       :close-on-click-modal="false"
@@ -67,7 +69,86 @@
       :center="true"
       custom-class="add-dialog"
     >
-      <div class="changePsw-main"></div>
+      <div class="addDig-main">
+        <div class="staff-img">
+          <img src="/static/img/setting/user.png">
+          <span class="img-tip">点击上传头像</span>
+        </div>
+        <div class="staff-form">
+          <div class="form-item">
+            <el-input v-model="formInline.user" placeholder="员工姓名"></el-input>
+            <el-input v-model="formInline.user" placeholder="自动生成用户名"></el-input>
+          </div>
+          <div class="form-item">
+            <el-input v-model="formInline.user" placeholder="手机号码"></el-input>
+            <el-date-picker v-model="formInline.user" type="date" placeholder="选择入职日期"></el-date-picker>
+          </div>
+          <div class="form-item">
+            <el-select v-model="formInline.user" placeholder="请选择部门">
+              <el-option label="区域一" value="shanghai"></el-option>
+              <el-option label="区域二" value="beijing"></el-option>
+            </el-select>
+            <el-select v-model="formInline.region" placeholder="请选择职务">
+              <el-option label="区域一" value="shanghai"></el-option>
+              <el-option label="区域二" value="beijing"></el-option>
+            </el-select>
+          </div>
+        </div>
+        <div class="staff-button">
+          <el-button type="text" class="btn-cancel" @click="showDepartDig=false">取消</el-button>
+          <el-button class="btn-save">保存</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!--删除弹窗-->
+    <el-dialog
+      title="删除提示"
+      :modal="false"
+      :top="0"
+      :visible.sync="showDeletwDig"
+      width="500px"
+      :close-on-click-modal="false"
+      :before-close="handleClose"
+      :center="true"
+      custom-class="delete-dialog"
+    >
+      <div class="delete-main">
+        <div class="delete-tip">
+          <span class="delete-tip1">是否确定删除该岗位？</span>
+          <span class="delete-tip2">•岗位删除后如遇到问题，请及时联系管理员</span>
+        </div>
+        <div class="delete-bottom">
+          <el-button type="text" class="btn-cancel" @click="showDeletwDig=false">取消</el-button>
+          <el-button class="btn-save">确认删除</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!--权限弹窗-->
+    <el-dialog
+      title="摄影部 易烊千玺 权限设置"
+      :modal="false"
+      :visible.sync="showAutDig"
+      width="882px"
+      :close-on-click-modal="false"
+      :before-close="handleClose"
+      :center="true"
+      :top="0"
+      custom-class="authority-dialog"
+    >
+      <div class="authority-main commonScrollStyle">
+        <div class="authority-list" v-for="auth in authList">
+          <span class="authority-title">订单</span>
+          <el-checkbox-group v-model="checkList" class="authority-item">
+            <el-checkbox label="复选框 A"></el-checkbox>
+            <el-checkbox label="复选框 B"></el-checkbox>
+            <el-checkbox label="复选框 C"></el-checkbox>
+            <el-checkbox label="复选框 D"></el-checkbox>
+            <el-checkbox label="复选框 E"></el-checkbox>
+          </el-checkbox-group>
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -166,7 +247,15 @@ export default {
       curStaff: { id: 0 },
       showOperate: false,
       iconStr: "iconStr",
-      showAddDig: false
+      showAddDig: false,
+      showDeletwDig: false,
+      showAutDig: true,
+      formInline: {
+        user: "",
+        region: ""
+      },
+      checkList: ["复选框 B", "复选框 A"],
+      authList: ["", "", "", "", "", ""]
     };
   },
   computed: {
@@ -238,7 +327,6 @@ export default {
      * 显示编辑资料弹窗
      */
     editMoadl() {
-      console.log("编辑资料", this.curStaff.name);
       this.hideAll();
       this.showAddDig = true;
     },
@@ -246,15 +334,15 @@ export default {
      * 显示权限弹窗
      */
     powerMoadl() {
-      console.log("权限", this.curStaff.name);
       this.hideAll();
+      this.showAutDig = true;
     },
     /**
      * 显示删除人员弹窗
      */
     deleteMoadl() {
-      console.log("删除人员", this.curStaff.name);
       this.hideAll();
+      this.showDeletwDig = true;
     },
     /**
      * 关闭弹窗
@@ -395,10 +483,126 @@ export default {
   color: #5996f8;
 }
 
-/*弹窗样式*/
-.add-dialog {
-  width: 652px;
-  height: 565px;
+/*弹出窗 新增用户*/
+.addDig-main {
+  width: 445px;
+  margin: 50px auto 0;
+}
+.staff-img {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.staff-img img {
+  max-width: 90px;
+  max-height: 90px;
+}
+
+.img-tip {
+  font-size: 14px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  margin-top: 17px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: #808080;
+}
+
+.staff-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 150px;
+  margin-top: 40px;
+}
+
+.form-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.el-button {
+  width: 96px;
+  height: 34px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  background: #5996f8;
+  padding: 0;
+  margin: 0 auto;
+}
+
+.staff-button {
+  height: 85px;
+  display: flex;
+  align-items: flex-end;
+  float: right;
+}
+
+.btn-cancel {
+  background: transparent;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: #999999;
+}
+
+/*删除弹窗*/
+.delete-tip {
+  margin-left: 88px;
+  margin-top: 35px;
+}
+
+.delete-tip1 {
+  width: 100%;
+  display: inline-block;
+  font-size: 22px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(76, 76, 76, 1);
+}
+.delete-tip2 {
+  width: 100%;
+  display: inline-block;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(128, 128, 128, 1);
+  margin-top: 28px;
+}
+
+.delete-bottom {
+  margin-top: 49px;
+  margin-right: 62px;
+  float: right;
+}
+
+/*权限弹窗*/
+.authority-main {
+  width: 740px;
+  max-height: 525px;
+  min-height: 200px;
+  margin: 45px auto;
+  overflow-y: auto;
+}
+
+.authority-title {
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: bold;
+  color: rgba(76, 76, 76, 1);
+}
+.authority-list {
+  margin-bottom: 59px;
+}
+
+.authority-main > div:last-child {
+  margin-bottom: 0px;
 }
 </style>
 
@@ -423,6 +627,109 @@ export default {
 }
 .iconStr2 {
   background-image: url("/static/img/setting/tree2.png");
+}
+
+/*弹窗样式*/
+.add-dialog {
+  width: 652px;
+  height: 565px;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
+}
+
+/*删除提示弹窗*/
+.delete-dialog {
+  width: 500px;
+  height: 299px;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
+}
+
+/*权限弹窗*/
+.authority-dialog {
+  width: 882px;
+  height: 695px;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
+}
+
+/*弹窗公共样式*/
+.add-dialog .el-dialog__header,
+.delete-dialog .el-dialog__header,
+.authority-dialog .el-dialog__header {
+  padding-top: 35px;
+}
+.add-dialog .el-dialog__title,
+.delete-dialog .el-dialog__title,
+.authority-dialog .el-dialog__title {
+  width: 101px;
+  height: 18px;
+  font-size: 17px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(157, 179, 215, 1);
+  line-height: 26px;
+}
+
+.add-dialog .el-dialog__body {
+  padding: 0px !important;
+  height: 495px;
+}
+.delete-dialog .el-dialog__body,
+.authority-dialog .el-dialog__body {
+  padding: 0px !important;
+}
+
+.add-dialog .el-dialog__headerbtn,
+.authority-dialog .el-dialog__headerbtn,
+.delete-dialog .el-dialog__headerbtn {
+  top: 29px;
+  font-size: 25px;
+}
+
+/*新增用户 弹窗input*/
+.form-item .el-input__inner,
+.form-item .el-input {
+  width: 200px;
+  height: 36px;
+  line-height: 36px;
+}
+
+/*权限弹窗 复选样式*/
+.authority-item {
+  margin-left: 30px;
+}
+
+.authority-item .el-checkbox {
+  margin: 30px 0 0 30px;
+  width: 145px;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: #4c4c4c;
+}
+
+.authority-item .el-checkbox__inner {
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+}
+
+.el-checkbox__inner::after {
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  content: "";
+  border: 2px solid #fff;
+  border-left: 0;
+  border-top: 0;
+  height: 11px;
+  left: 5px;
+  position: absolute;
+  top: 1px;
+  -webkit-transform: rotate(45deg) scaleY(0);
+  transform: rotate(45deg) scaleY(0);
+  width: 6px;
+  transform-origin: center;
 }
 </style>
 

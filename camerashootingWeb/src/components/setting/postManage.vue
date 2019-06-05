@@ -18,18 +18,20 @@
         <el-table-column prop="depart" label="部门" width="250"></el-table-column>
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
-            <span class="table-delete noSelect">删除</span>
-            <span class="table-edit noSelect">编辑</span>
+            <span class="table-delete noSelect" @click="deleteDepartDig">删除</span>
+            <span class="table-edit noSelect" @click="editDepartDig">编辑</span>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
+    <!--编辑新增弹窗-->
     <el-dialog
-      title="编辑"
+      title="新增"
       :modal="false"
       :visible.sync="showDepartDig"
       width="520px"
+      :top="0"
       :close-on-click-modal="false"
       :before-close="handleClose"
       :center="true"
@@ -37,7 +39,7 @@
     >
       <div class="changePsw-main">
         <div>
-          <span class="from-title">部&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;门：</span>
+          <span class="from-title">类&nbsp;&nbsp;&nbsp;型：</span>
           <el-select v-model="value" placeholder="请选择">
             <el-option
               v-for="item in options"
@@ -48,23 +50,40 @@
           </el-select>
         </div>
         <div>
-          <span class="from-title">默认岗位：</span>
-          <el-select v-model="value" placeholder="请选择">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
+          <span class="from-title">岗&nbsp;&nbsp;&nbsp;位：</span>
+          <el-input class="new-phone" v-model="value" placeholder="输入岗位名称"></el-input>
         </div>
         <div>
-          <span class="from-title">排&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;序：</span>
-          <el-input class="new-phone" v-model="input3" placeholder="请输入序号" type="number"></el-input>
+          <span class="from-title">负责人：</span>
+          <el-input class="new-phone" v-model="value" placeholder="输入负责人姓名"></el-input>
         </div>
         <div class="changePsw-bottom">
           <el-button type="text" class="btn-cancel" @click="showDepartDig=false">取消</el-button>
           <el-button class="btn-save">保存</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!--删除弹窗-->
+    <el-dialog
+      title="删除提示"
+      :modal="false"
+      :visible.sync="showDeletwDig"
+      width="500px"
+      :top="0"
+      :close-on-click-modal="false"
+      :before-close="handleClose"
+      :center="true"
+      custom-class="delete-dialog"
+    >
+      <div class="delete-main">
+        <div class="delete-tip">
+          <span class="delete-tip1">是否确定删除该岗位？</span>
+          <span class="delete-tip2">•岗位删除后如遇到问题，请及时联系管理员</span>
+        </div>
+        <div class="delete-bottom">
+          <el-button type="text" class="btn-cancel" @click="showDeletwDig=false">取消</el-button>
+          <el-button class="btn-save">确认删除</el-button>
         </div>
       </div>
     </el-dialog>
@@ -121,10 +140,8 @@ export default {
         }
       ],
       value: "",
-      input1: "",
-      input2: "",
-      input3: "",
-      showDepartDig: false
+      showDepartDig: false,
+      showDeletwDig: false
     };
   },
   computed: {},
@@ -134,6 +151,9 @@ export default {
     },
     editDepartDig() {
       this.showDepartDig = true;
+    },
+    deleteDepartDig() {
+      this.showDeletwDig = true;
     }
   }
 };
@@ -241,6 +261,35 @@ export default {
   font-weight: bold;
   color: #4c4c4c;
 }
+
+.delete-tip {
+  margin-left: 88px;
+  margin-top: 35px;
+}
+
+.delete-tip1 {
+  width: 100%;
+  display: inline-block;
+  font-size: 22px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(76, 76, 76, 1);
+}
+.delete-tip2 {
+  width: 100%;
+  display: inline-block;
+  font-size: 14px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(128, 128, 128, 1);
+  margin-top: 28px;
+}
+
+.delete-bottom {
+  margin-top: 49px;
+  margin-right: 62px;
+  float: right;
+}
 </style>
 
 <!--无scoped 覆盖框架默认样式-->
@@ -276,6 +325,7 @@ export default {
   line-height: 34px;
 }
 
+/*编辑信息弹窗*/
 .change-dialog {
   width: 520px;
   height: 396px;
@@ -283,11 +333,20 @@ export default {
   box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
 }
 
-/*编辑信息弹窗*/
-.change-dialog .el-dialog__header {
+/*删除提示弹窗*/
+.delete-dialog {
+  width: 500px;
+  height: 299px;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
+}
+
+.change-dialog .el-dialog__header,
+.delete-dialog .el-dialog__header {
   padding-top: 35px;
 }
-.change-dialog .el-dialog__title {
+.change-dialog .el-dialog__title,
+.delete-dialog .el-dialog__title {
   width: 101px;
   height: 18px;
   font-size: 17px;
@@ -297,11 +356,13 @@ export default {
   line-height: 26px;
 }
 
-.change-dialog .el-dialog__body {
+.change-dialog .el-dialog__body,
+.delete-dialog .el-dialog__body {
   padding: 0px !important;
 }
 
-.change-dialog .el-dialog__headerbtn {
+.change-dialog .el-dialog__headerbtn,
+.delete-dialog .el-dialog__headerbtn {
   top: 29px;
   font-size: 25px;
 }
