@@ -29,6 +29,7 @@
 /*visibility: hidden;*/
 /*}*/
 
+.commonScrollStyle::-webkit-scrollbar,
 .list ul li .personBox::-webkit-scrollbar,
 .workBox .list::-webkit-scrollbar,
 .nav ul::-webkit-scrollbar
@@ -41,6 +42,7 @@
   border-radius: 1px;
 }
 
+.commonScrollStyle::-webkit-scrollbar-thumb,
 .list ul li .personBox::-webkit-scrollbar-thumb,
 .workBox .list::-webkit-scrollbar-thumb,
 .nav ul::-webkit-scrollbar-thumb
