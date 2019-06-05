@@ -1,7 +1,7 @@
 <template>
   <div class="setting-content">
     <el-menu
-      default-active="user"
+      default-active="post"
       class="el-menu-demo noSelect noBorder"
       mode="horizontal"
       text-color="#1D213E"
@@ -16,16 +16,20 @@
     </el-menu>
     <Personal v-show="activeItem=='personal'"></Personal>
     <UserManage v-show="activeItem=='user'"></UserManage>
+    <DepartManage v-show="activeItem=='depart'"></DepartManage>
+    <PostManage v-show="activeItem=='post'"></PostManage>
   </div>
 </template>
 <script>
 import Personal from "@/components/setting/personal";
 import UserManage from "@/components/setting/userManage";
+import DepartManage from "@/components/setting/departManage";
+import PostManage from "@/components/setting/postManage";
 export default {
-  components: { Personal, UserManage },
+  components: { Personal, UserManage, DepartManage,PostManage },
   data() {
     return {
-      activeItem: "user"
+      activeItem: "post"
     };
   },
   methods: {

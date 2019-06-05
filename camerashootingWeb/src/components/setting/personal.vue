@@ -19,7 +19,7 @@
     <!--修改电话弹窗-->
     <el-dialog
       title="更换电话号码"
-      :modal="dialogVisible"
+      :modal="false"
       :visible.sync="dialogVisible"
       width="520px"
       :close-on-click-modal="false"
@@ -48,7 +48,7 @@
     <!--修改密码弹窗-->
     <el-dialog
       title="修改登录密码"
-      :modal="changePsw"
+      :modal="false"
       :visible.sync="changePsw"
       width="520px"
       :close-on-click-modal="false"
@@ -191,7 +191,6 @@ export default {
 .new-phone {
   width: 184px;
   height: 32px;
-  border: 1px solid rgba(221, 221, 221, 1);
   border-radius: 5px;
 }
 
@@ -308,7 +307,6 @@ export default {
 .change-dialog .el-input__inner {
   width: 184px;
   height: 32px;
-  border: none;
   padding-left: 12px;
 }
 </style>
