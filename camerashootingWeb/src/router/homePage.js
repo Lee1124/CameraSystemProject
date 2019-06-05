@@ -3,6 +3,7 @@ import Calender from '@/components/calendar/calendar';
 import demoPage from '@/components/demoPage/demoPage';
 import orderManage from '@/components/orderManage/orderManage';
 import orderManageOurShop from '@/components/orderManage/orderManage-ourShop/orderManage-ourShop';
+import orderManageWillRepayOrder from '@/components/orderManage/orderManage-willRepayOrder/orderManage-willRepayOrder';
 import setting from '@/components/setting/settingHome';
 
 export default [
@@ -35,7 +36,11 @@ export default [
           {
             path: 'orderManageOurShop',
             component: orderManageOurShop,
-          }
+          },
+          {
+            path: 'orderManageWillRepayOrder',
+            component: orderManageWillRepayOrder,
+          },
         ]
       }
     ]

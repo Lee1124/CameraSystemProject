@@ -93,10 +93,12 @@
     loadEvent() {
       let that = this;
       $('body').on('click', e => {
-        if ($(e.target).attr('class').indexOf('avoid') == -1) {
-          that.isShowSelectBox = false;
-        } else {
-          that.isShowSelectBox = true;
+        if ($(e.target).attr('class')!=undefined){
+          if ($(e.target).attr('class').indexOf('avoid') == -1) {
+            that.isShowSelectBox = false;
+          } else {
+            that.isShowSelectBox = true;
+          }
         }
       })
     },
