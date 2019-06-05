@@ -53,10 +53,13 @@ Vue.directive('focus', {
   }
 });
 
-//全局注册组件:
+//注册组件:
 import dropSelect from './components/calendar/dropSelect'
-
 Vue.component('dropSelect', dropSelect);
+
+//全局注册人员安排组件:
+import personManageDiaLog from './components/orderManage/diaLog/personManageDiaLog'
+Vue.component('personManageDiaLog', personManageDiaLog);
 
 
 // //自定义滚动事件指令

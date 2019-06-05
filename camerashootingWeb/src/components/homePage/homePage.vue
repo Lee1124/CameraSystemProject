@@ -69,6 +69,7 @@
     text-align: center;
     /*padding: 3.5% 7%;*/
     padding: 0;
+    position: relative;
     /*min-width: 1150px;*/
   }
 

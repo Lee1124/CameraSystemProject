@@ -1,5 +1,9 @@
 <template>
   <div id="orderManageTable" ref="orderManageTable" :style="{opacity:orderManageTableOpacity}">
+
+    <!--弹框-->
+    <personManageDiaLog :rowObj="rowObj" :showPersonManageDiaLog="showPersonManageDiaLog"></personManageDiaLog>
+
     <div ref="tableBox" :class="['tableBox']">
       <el-table
         :data="tableData"
@@ -17,15 +21,16 @@
           <el-table-column
             :label="items.name"
             show-overflow-tooltip
-            v-if="items.id!=1&&items.id!=2&&items.id!=6&&items.id!=7&&items.id!=9&&items.id!=12&&items.id!=13"
+            v-if="items.id!=1&&items.id!=2&&items.id!=6&&items.id!=7&&items.id!=8
+            &&items.id!=9&&items.id!=10&&items.id!=11&&items.id!=12&&items.id!=13"
             align="center">
             <template slot-scope=scope>
               <span v-if="items.id==3">{{scope.row.hotel}}</span>
               <span v-if="items.id==4">{{scope.row.hunQ}}</span>
               <span v-if="items.id==5">{{scope.row.keHu}}</span>
-              <span v-if="items.id==8">{{scope.row.xs}}</span>
-              <span v-if="items.id==10">{{scope.row.hq}}</span>
-              <span v-if="items.id==11">{{scope.row.kf}}</span>
+              <!--<span v-if="items.id==8">{{scope.row.xs}}</span>-->
+              <!--<span v-if="items.id==10">{{scope.row.hq}}</span>-->
+              <!--<span v-if="items.id==11">{{scope.row.kf}}</span>-->
             </template>
           </el-table-column>
 
@@ -60,7 +65,7 @@
             align="center">
             <template slot-scope=scope>
               <span>{{scope.row.zt}}</span>
-              <div class="rightClickShadow" @contextmenu.prevent="rightClick($event,scope.row)"></div>
+              <div class="rightClickShadow" @contextmenu.prevent="stateRightClick($event,scope.row)"></div>
               <div class="rightClickContent" :style="{top:menuTop,left:menuLeft}" v-show="scope.row.isShowRightMenu">
                 <ul>
                   <li>回馈表(已确认)</li>
@@ -71,6 +76,7 @@
             </template>
           </el-table-column>
 
+          <!--拍摄-->
           <el-table-column
             :label="items.name"
             v-if="items.id==9"
@@ -81,29 +87,99 @@
               <template v-for="(item2,index) in scope.row.ps">
                 <span class="morePS" v-if="index<=1">{{item2}}<i>、</i></span>
               </template>
-              <div class="moreImg" @click="showMoreMenu($event,scope.row)" v-if="scope.row.ps.length>2">
-                <div class="moreList" v-show="scope.row.isShowMoreMenu" :style="{top:moreListTop,left:moreListLeft}"
-                     v-if="scope.row.ps.length>2">
-                  <ul>
-                    <template v-for="(item2,index) in scope.row.ps">
-                      <li v-if="index>1" v-text="item2"></li>
-                    </template>
-                    <li>修改</li>
-                  </ul>
-                </div>
+              <div class="moreImg" @click="showShotMoreMenu($event,scope.row,'haveBtn')"
+                   v-if="items.id==9&&scope.row.ps.length>2">
+                <commonMenu-shot v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
+                                 :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
               </div>
 
+              <div class="rightClickShadow" v-if="items.id==9&&scope.row.ps.length<=2"
+                   @contextmenu.prevent="showShotMoreMenu($event,scope.row,'noBtn')">
+                <commonMenu-shot v-show="scope.row.isShowShotMoreMenu" :shotMenuData="shotMenuData"
+                                 :style="{top:moreShotMenuTop,left:moreShotMenuLeft}"></commonMenu-shot>
+              </div>
+
+            </template>
+          </el-table-column>
+
+          <!--销售、后期、客服-->
+          <el-table-column
+            :label="items.name"
+            v-if="items.id==8||items.id==10||items.id==11"
+            width="100"
+            align="center">
+            <template slot-scope=scope>
+              <span v-if="items.id==8">
+                <template v-for="(items,index) in scope.row.xs">
+                  <span v-if="index<1">{{items}}</span>
+                </template>
+                <span v-if="scope.row.xs.length==0"><a href="#" class="commonColor">添加</a></span>
+              </span>
+              <span v-if="items.id==10">
+                 <template v-for="(items,index) in scope.row.hq">
+                  <span v-if="index<1">{{items}}</span>
+                </template>
+                <span v-if="scope.row.hq.length==0"><a href="#" class="commonColor">添加</a></span>
+              </span>
+              <span v-if="items.id==11">
+              <template v-for="(items,index) in scope.row.kf">
+                  <span v-if="index<1">{{items}}</span>
+                </template>
+                <span v-if="scope.row.kf.length==0"><a href="#" class="commonColor">添加</a></span>
+              </span>
+              <div class="rightClickShadow" v-if="items.id==8&&scope.row.xs.length==1"
+                   @contextmenu.prevent="shotPersonRightClick($event,scope.row,'sale')">
+                <commonMenu :menuData="menuData" v-show="scope.row.isShowSaleMenu"
+                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+              </div>
+              <div class="rightClickShadow" v-if="items.id==10&&scope.row.hq.length==1"
+                   @contextmenu.prevent="shotPersonRightClick($event,scope.row,'lastTime')">
+                <commonMenu :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
+                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+              </div>
+              <div class="rightClickShadow" v-if="items.id==11&&scope.row.kf.length==1"
+                   @contextmenu.prevent="shotPersonRightClick($event,scope.row,'customer')">
+                <commonMenu :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
+                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+              </div>
+
+              <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'sale')"
+                   v-if="items.id==8&&scope.row.xs.length>1">
+                <commonMenu :menuType="menuType" :menuData="menuData" v-show="scope.row.isShowSaleMenu"
+                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+              </div>
+              <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'lastTime')"
+                   v-if="items.id==10&&scope.row.hq.length>1">
+                <commonMenu :menuData="menuData" v-show="scope.row.isShowLastTimeMenu"
+                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+              </div>
+              <div class="moreImg" @click="showPersonMoreMenu($event,scope.row,'customer')"
+                   v-if="items.id==11&&scope.row.kf.length>1">
+                <commonMenu :menuData="menuData" v-show="scope.row.isShowCustomerMenu"
+                            :style="{top:moreSmallMenuTop,left:moreSmallMenuLeft}"></commonMenu>
+              </div>
             </template>
           </el-table-column>
 
           <el-table-column
             :label="items.name"
             show-overflow-tooltip
-            v-if="items.id==6||items.id==12||items.id==13"
+            v-if="items.id==6"
             sortable="custom"
             align="center">
             <template slot-scope=scope>
               <span v-if="items.id==6">{{scope.row.xm}}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            :label="items.name"
+            show-overflow-tooltip
+            v-if="items.id==12||items.id==13"
+            sortable="custom"
+            width="80"
+            align="center">
+            <template slot-scope=scope>
               <span v-if="items.id==12">{{scope.row.price}}</span>
               <span v-if="items.id==13">{{scope.row.ht}}
                 <span class="fillSpan"></span>
@@ -116,8 +192,12 @@
   </div>
 </template>
 <script>
+
   /*数据*/
   let dataObj = {
+    //弹框数据
+    showPersonManageDiaLog:false,
+
     //表格的最外层高度
     orderManageTableBoxHeight: 0,
     tableBoxHeight: 0,
@@ -125,8 +205,15 @@
     orderManageTableOpacity: 0,
     menuTop: 0,
     menuLeft: 0,
-    moreListTop: 0,
-    moreListLeft: 0,
+    moreShotMenuTop: 0,
+    moreShotMenuLeft: 0,
+    moreSmallMenuTop: 0,
+    moreSmallMenuLeft: 0,
+
+    menuData: [],
+    menuType:'xs',
+    shotMenuData: [],
+    rowObj:{},
     //表头数据
     colData: [
       {name: '操作', id: 1},
@@ -148,54 +235,63 @@
     tableData: [
       {
         date: '2016.05.02',
-        hotel: '（成都）丽思卡尔顿酒店',
+        hotel: '（成都）丽思卡尔顿酒店4444444444',
         hunQ: '喜来婚礼',
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
+        xs: ['小花'],
         ps: ['小巫师', '周杰伦', '哈哈哈'],
-        hq: '小娃',
-        kf: '嘻嘻',
-        price: '1000',
-        ht: '1000',
+        hq: ['小花', '哈哈'],
+        kf: ['小花'],
+        price: '100055',
+        ht: '1005555',
         isCQ: true,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
         id: 1,
       },
       {
         date: '2016.05.02',
-        hotel: '（成都）丽思卡尔顿酒店',
+        hotel: '（成都）丽思卡尔顿酒店5555555555',
         hunQ: '喜来婚礼',
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
+        xs: ['小花', '小伙子'],
         ps: ['小巫师', '周杰伦'],
-        hq: '小娃',
-        kf: '嘻嘻',
+        hq: ['小花', '小伙子'],
+        kf: ['小花', '小伙子'],
         price: '800',
         ht: '1000',
         isCQ: false,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
       }, {
         date: '2016.05.02',
-        hotel: '（成都）丽思卡尔顿酒店',
+        hotel: '（成都）丽思卡尔顿酒店6666666666',
         hunQ: '喜来婚礼',
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
+        xs: [],
         ps: ['小巫师', '周杰伦'],
-        hq: '小娃',
-        kf: '嘻嘻',
+        hq: [],
+        kf: [],
         price: '1000',
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
       },
       {
         date: '2016.05.02',
@@ -204,15 +300,18 @@
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
-        ps: ['小巫师', '周杰伦'],
-        hq: '小娃',
-        kf: '嘻嘻',
+        xs: ['小花', '周杰伦'],
+        ps: ['小巫师', '周杰伦', '哈哈哈'],
+        hq: ['小花'],
+        kf: ['小花'],
         price: '1000',
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -220,15 +319,18 @@
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
+        xs: ['小花'],
         ps: ['小巫师', '周杰伦'],
-        hq: '小娃',
-        kf: '嘻嘻',
+        hq: ['小花'],
+        kf: ['小花'],
         price: '1000',
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
       },
       {
         date: '2016.05.02',
@@ -237,15 +339,18 @@
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
+        xs: ['小花'],
         ps: ['小巫师', '周杰伦'],
-        hq: '小娃',
-        kf: '嘻嘻',
+        hq: ['小花'],
+        kf: ['小花'],
         price: '1000',
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
       }, {
         date: '2016.05.02',
         hotel: '（成都）丽思卡尔顿酒店',
@@ -253,15 +358,18 @@
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
-        ps: ['小巫师', '周杰伦'],
-        hq: '小娃',
-        kf: '嘻嘻',
+        xs: ['小花'],
+        ps: ['小巫师', '周杰伦', '呵呵呵'],
+        hq: ['小花'],
+        kf: ['小花'],
         price: '1000',
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
       },
       {
         date: '2016.05.02',
@@ -270,104 +378,30 @@
         keHu: '陈建州&范玮琪',
         xm: '高清双机(含快剪)',
         zt: '待安排拍摄',
-        xs: '小李',
+        xs: ['小花'],
         ps: ['小巫师', '周杰伦'],
-        hq: '小娃',
-        kf: '嘻嘻',
+        hq: ['小花'],
+        kf: ['小花'],
         price: '1000',
         ht: '1000',
         isCQ: true,
         isShowRightMenu: false,
-        isShowMoreMenu: false,
+        isShowShotMoreMenu: false,//拍摄
+        isShowSaleMenu: false,//销售
+        isShowLastTimeMenu: false,//后期
+        isShowCustomerMenu: false,//客服
       },
-      // {
-      //   date: '2016.05.02',
-      //   hotel: '（成都）丽思卡尔顿酒店',
-      //   hunQ: '喜来婚礼',
-      //   keHu: '陈建州&范玮琪',
-      //   xm: '高清双机(含快剪)',
-      //   zt: '待安排拍摄',
-      //   xs: '小李',
-      //   ps: '小巫师',
-      //   hq: '小娃',
-      //   kf: '嘻嘻',
-      //   price: '1000',
-      //   ht: '1000',
-      // }, {
-      //   date: '2016.05.02',
-      //   hotel: '（成都）丽思卡尔顿酒店',
-      //   hunQ: '喜来婚礼',
-      //   keHu: '陈建州&范玮琪',
-      //   xm: '高清双机(含快剪)',
-      //   zt: '待安排拍摄',
-      //   xs: '小李',
-      //   ps: '小巫师',
-      //   hq: '小娃',
-      //   kf: '嘻嘻',
-      //   price: '1000',
-      //   ht: '1000',
-      // }, {
-      //   date: '2016.05.02',
-      //   hotel: '（成都）丽思卡尔顿酒店',
-      //   hunQ: '喜来婚礼',
-      //   keHu: '陈建州&范玮琪',
-      //   xm: '高清双机(含快剪)',
-      //   zt: '待安排拍摄',
-      //   xs: '小李',
-      //   ps: '小巫师',
-      //   hq: '小娃',
-      //   kf: '嘻嘻',
-      //   price: '1000',
-      //   ht: '1000',
-      // }, {
-      //   date: '2016.05.02',
-      //   hotel: '（成都）丽思卡尔顿酒店',
-      //   hunQ: '喜来婚礼',
-      //   keHu: '陈建州&范玮琪',
-      //   xm: '高清双机(含快剪)',
-      //   zt: '待安排拍摄',
-      //   xs: '小李',
-      //   ps: '小巫师',
-      //   hq: '小娃',
-      //   kf: '嘻嘻',
-      //   price: '1000',
-      //   ht: '1000',
-      // }, {
-      //   date: '2016.05.02',
-      //   hotel: '（成都）丽思卡尔顿酒店',
-      //   hunQ: '喜来婚礼',
-      //   keHu: '陈建州&范玮琪',
-      //   xm: '高清双机(含快剪)',
-      //   zt: '待安排拍摄',
-      //   xs: '小李',
-      //   ps: '小巫师',
-      //   hq: '小娃',
-      //   kf: '嘻嘻',
-      //   price: '1000',
-      //   ht: '1000',
-      // }, {
-      //   date: '2016.05.02',
-      //   hotel: '（成都）丽思卡尔顿酒店',
-      //   hunQ: '喜来婚礼',
-      //   keHu: '陈建州&范玮琪',
-      //   xm: '高清双机(含快剪)',
-      //   zt: '待安排拍摄',
-      //   xs: '小李',
-      //   ps: '小巫师',
-      //   hq: '小娃',
-      //   kf: '嘻嘻',
-      //   price: '1000',
-      //   ht: '1000',
-      // },
     ]
   };
   /*方法*/
   let myMethods = {
-    //显示更多菜单
-    showMoreMenu(e, rowObj) {
-      rowObj.isShowMoreMenu = true;
-      this.moreListTop = $(e.target).offset().top + 25 + 'px';
-      this.moreListLeft = $(e.target).offset().left - 8 + 'px';
+    //打开人员安排弹框
+    openPersonDiaLog(){
+      this.showPersonManageDiaLog=true;
+    },
+    //关闭弹框
+    closeDialog(){
+      this.showPersonManageDiaLog=false;
     },
     //获取合计
     getSummaries(param) {
@@ -408,13 +442,64 @@
       });
       return sums;
     },
-    //隐藏右击菜单
+    //鼠标移出单元格隐藏右击菜单
     hideRightClickMenu(row, column, cell, event) {
       row.isShowRightMenu = false;
-      row.isShowMoreMenu = false;
+      row.isShowShotMoreMenu = false;
+      row.isShowSaleMenu = false;
+      row.isShowLastTimeMenu = false;
+      row.isShowCustomerMenu = false;
     },
-    //右击事件
-    rightClick(e, rowObj) {
+
+    //拍摄人员--更多图标点击和右击显示更多菜单
+    showShotMoreMenu(e, rowObj, type) {
+      rowObj.isShowShotMoreMenu = true;
+      this.shotMenuData = rowObj.ps;
+      if (type == 'haveBtn') {
+        this.moreShotMenuTop = $(e.target).offset().top + 25 + 'px';
+        this.moreShotMenuLeft = $(e.target).offset().left - 8 + 'px';
+      } else if (type == 'noBtn') {
+        this.moreShotMenuTop = $(e.target).offset().top + 40 + 'px';
+        this.moreShotMenuLeft = $(e.target).offset().left + 100 + 'px';
+      }
+    },
+
+    //销售等人员--更多图标点击显示更多菜单
+    showPersonMoreMenu(e, rowObj, type) {
+      this.rowObj=rowObj;
+      if (type == 'sale') {
+        rowObj.isShowSaleMenu = true;
+        this.menuData = rowObj.xs;
+      } else if (type == 'lastTime') {
+        rowObj.isShowLastTimeMenu = true;
+        this.menuData = rowObj.hq;
+      } else if (type == 'customer') {
+        rowObj.isShowCustomerMenu = true;
+        this.menuData = rowObj.kf;
+      }
+      this.moreSmallMenuTop = $(e.target).offset().top + 25 + 'px';
+      this.moreSmallMenuLeft = $(e.target).offset().left - 8 + 'px';
+    },
+
+    //销售等人员--单元格的右击显示菜单
+    shotPersonRightClick(e, rowObj, type) {
+      this.rowObj=rowObj;
+      if (type == 'sale') {
+        rowObj.isShowSaleMenu = true;
+        this.menuData = rowObj.xs;
+      } else if (type == 'lastTime') {
+        rowObj.isShowLastTimeMenu = true;
+        this.menuData = rowObj.hq;
+      } else if (type == 'customer') {
+        rowObj.isShowCustomerMenu = true;
+        this.menuData = rowObj.kf;
+      }
+      this.moreSmallMenuTop = $(e.target).offset().top + 40 + 'px';
+      this.moreSmallMenuLeft = $(e.target).offset().left + 40 + 'px';
+    },
+
+    //状态--单元格的右击显示菜单
+    stateRightClick(e, rowObj) {
       rowObj.isShowRightMenu = true;
       this.menuTop = $(e.target).offset().top + 40 + 'px';
       this.menuLeft = $(e.target).offset().left + 25 + 'px';
@@ -457,6 +542,7 @@
     },
     methods: myMethods,
     created() {
+      window.openPersonDiaLog=this.openPersonDiaLog;
       this.loadResize();
       this.$nextTick(() => {
         setTimeout(() => {
@@ -466,11 +552,46 @@
       })
     },
     mounted() {
+    },
+    components: {
+      'commonMenu-shot': {
+        template: `<div class="moreList">
+            <ul>
+                <li v-for="(items,index) in shotMenuData" v-if="index>1">{{items}}</li>
+                <li class="change">修改</li>
+            </ul>
+         </div>`,
+        props: ['shotMenuData'],
+        data() {
+          return {}
+        }
+      },
+      'commonMenu': {
+        template: `<div class="moreList">
+            <ul>
+                <li v-for="(items,index) in menuData" v-if="index>0">{{items}}</li>
+                <li class="change" @click="changePerson($event,menuType)">修改</li>
+            </ul>
+         </div>`,
+        props: ['menuData','menuType'],
+        data() {
+          return {}
+        },
+        methods: {
+          changePerson(e,type) {
+            console.log(e.target)
+            console.log(type)
+            window.openPersonDiaLog();
+          }
+        }
+      },
     }
   }
 </script>
 
 <style scoped>
+  @import "../../../../static/css/orderTableStyle.css";
+
   #orderManageTable {
     height: 100%;
   }
@@ -479,224 +600,20 @@
     max-height: 100%;
   }
 
-  >>> .el-table__body-wrapper::-webkit-scrollbar {
-    width: 3px;
-    height: 5px;
-    background: #E7EEF9;
-    -webkit-border-radius: 1px;
-    -moz-border-radius: 1px;
-    border-radius: 1px;
-  }
-
-  >>> .el-table__body-wrapper::-webkit-scrollbar-thumb {
-    background-color: #CED8EA;
-    width: 3px;
-    height: 5px;
-    -webkit-border-radius: 1px;
-    -moz-border-radius: 1px;
-    border-radius: 1px;
-  }
-
-  >>> .el-table .ascending .sort-caret.ascending {
-    border-bottom-color: #5996F8;
-  }
-
-  >>> .el-table .descending .sort-caret.descending {
-    border-top-color: #5996F8;
-  }
-
-  >>> .el-table::before {
-    display: none;
-  }
-
-  >>> .el-table--border::after, .el-table--group::after {
-    height: auto;
-    background: #DDD;
-    bottom: 54px;
-  }
-
-  >>> .orderTableHeaderStyle th {
-    background: #E5E5E5;
-    height: 45px;
-    padding: 0;
-    line-height: 45px;
-    color: #808080;
-    font-size: 14px;
-    border-bottom: 0;
-    border-color: #DDD;
-  }
-
-  >>> .orderTableHeaderStyle th:nth-last-of-type(2) {
-    border: 0;
-  }
-
-  >>> .orderTableHeaderStyle th:first-of-type {
-    border-left: 1px solid #DDD;
-  }
-
-  >>> .orderTableRowStyle td {
-    padding: 0;
-    height: 45px;
-    border-top: 0;
-    border-bottom: 0;
-    border-color: #DDD;
+  >>> .moreList ul li {
     transition: all .2s;
+    height: 28px;
+    line-height: 28px;
   }
 
-  >>> .orderTableRowStyle td:first-of-type {
-    border-left: 1px solid #DDD;
-  }
-
-  >>> .orderTableRowStyle td:first-of-type a {
-    color: #5996F8;
-  }
-
-  >>> .orderTableRowStyle td .fillSpan {
-    position: absolute;
-    height: 100%;
-    width: 17px;
-    top: 0;
-    right: -17px;
-  }
-
-  >>> .orderTableRow1nStyle td {
-    background: #F6F6F6;
-  }
-
-  >>> .orderTableRow1nStyle td .fillSpan {
-    background: #F6F6F6;
-  }
-
-  >>> .orderTableRow2nStyle td {
-    background: #F0F0F0;
-  }
-
-  >>> .orderTableRow2nStyle td .fillSpan {
-    background: #F0F0F0;
-  }
-
-  >>> .orderTableRowStyle:hover td {
-    background: #F0F4FA !important;
-    color: #5996F8;
-  }
-
-  >>> .orderTableRowStyle:hover td .fillSpan {
-    background: #F0F4FA !important;
-  }
-
-  >>> .el-table__footer-wrapper .has-gutter td {
-    background: #F6F6F6;
-    border-color: #F6F6F6;
-    color: #FF0000;
-    font-weight: 700;
-    border-top: 1px solid #DDD;
-  }
-
-  >>> .el-table__footer-wrapper .has-gutter td:first-of-type {
-    font-weight: 400;
-  }
-
-  >>> .el-table__footer-wrapper .has-gutter th.gutter {
-    background: #F6F6F6;
-    border: 0;
-  }
-
-  >>> .el-table .cell.el-tooltip {
-    padding: 0 4px;
-  }
-
-  .rightClickShadow {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-  }
-
-  .rightClickContent {
-    position: fixed;
-    z-index: 999;
-    background: #fff;
-    width: 120px;
-    border: 1px solid rgba(220, 230, 245, 1);
-    border-radius: 5px;
-    padding: 10px 0;
-  }
-
-  .rightClickContent::before, .moreList::before {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #fff;
-    -webkit-transform: rotate(45deg);
-    -moz-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    -o-transform: rotate(45deg);
-    transform: rotate(45deg);
-    top: -5px;
-    left: 17px;
-    border: 1px solid rgba(220, 230, 245, 1);
-    border-bottom: 0;
-    border-right: 0;
-  }
-
-  .rightClickContent li {
-    height: 32px;
-    line-height: 32px;
-    font-size: 12px;
-    color: #808080;
-    cursor: pointer;
-    transition: all .2s;
-  }
-
-  .rightClickContent li:hover {
-    color: #5996F8;
-    background: #EFF3F9;
-  }
-
-  .morePS:nth-of-type(2) i {
-    display: none;
-  }
-
-  .moreImg {
-    display: inline-block;
-    width: 30px;
-    height: 18px;
-    vertical-align: -4px;
-    background: url("../../../../static/img/order/more1.png") no-repeat center center;
-    transition: all .2s;
+  >>> .moreList ul li.change {
     cursor: pointer;
   }
 
-  .moreImg:hover {
-    background: url("../../../../static/img/order/more2.png") no-repeat center center;
-  }
-
-  .moreList {
-    position: fixed;
-    width: 58px;
-    z-index: 999;
-    background: rgba(255, 255, 255, 1);
-    border: 1px solid rgba(220, 230, 245, 1);
-    border-radius: 5px;
-    font-size: 12px;
-    color: #808080;
-    padding: 6px 0;
-  }
-
-  .moreList li {
-    height: 24px;
-    line-height: 24px;
-  }
-
-  .moreList li:last-of-type {
-    cursor: pointer;
-    transition: all .2s;
-  }
-
-  .moreList li:last-of-type:hover {
-    color: #5996F8;
+  >>> .moreList ul li.change:hover {
     text-decoration: underline;
+    color: #5996F8;
   }
+
+
 </style>
