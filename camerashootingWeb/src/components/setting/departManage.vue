@@ -1,32 +1,36 @@
 <template>
   <div class="user-content">
     <div class="div-search">
-      <el-input placeholder="搜索人员" v-model="searchStr"></el-input>
+      <el-input placeholder="搜索部门" v-model="searchStr"></el-input>
       <div>
-        <el-button>查询</el-button>
-        <el-button class="button-add">新增</el-button>
+        <el-button @click="getMyBranchDepartmentList">查询</el-button>
+        <el-button class="button-add" @click="showAddDig">新增</el-button>
       </div>
     </div>
-    <el-table
-      :data="tableData"
-      stripe
-      border
-      style="width: 876px"
-      header-row-class-name="depart-header"
-      row-class-name="depart-row"
-      highlight-current-row
-    >
-      <el-table-column prop="index" label="序号" width="150"></el-table-column>
-      <el-table-column prop="depart" label="部门" width="255"></el-table-column>
-      <el-table-column prop="post" label="默认岗位" width="265"></el-table-column>
-      <el-table-column label="操作" width="200">
-        <template slot-scope="scope">
-          <span class="table-edit" @click="editDepartDig">编辑</span>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div ref="tableBox" class="div-table" style="height:79.5%">
+      <el-table
+        :data="departList"
+        stripe
+        border
+        :max-height="tableHeight"
+        style="width: 871px"
+        header-row-class-name="depart-header"
+        row-class-name="depart-row"
+        highlight-current-row
+      >
+        <el-table-column type="index" label="序号" width="150"></el-table-column>
+        <el-table-column prop="DepartmentName" label="部门" width="255"></el-table-column>
+        <el-table-column prop="DefaultPostName" label="默认岗位" width="265"></el-table-column>
+        <el-table-column label="操作" width="200">
+          <template slot-scope="scope">
+            <span class="table-edit" @click="editDepartDig(scope.row)">编辑</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
     <el-dialog
-      title="编辑"
+      :title="digTitle"
       :modal="false"
       top="0"
       :visible.sync="showDepartDig"
@@ -39,33 +43,39 @@
       <div class="changePsw-main">
         <div>
           <span class="from-title">部&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;门：</span>
-          <el-select v-model="value" placeholder="请选择">
+          <!-- <el-select v-model="value" placeholder="请选择">
             <el-option
               v-for="item in options"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             ></el-option>
-          </el-select>
+          </el-select>-->
+          <el-input class="new-phone" v-model="curDepart.DepartmentName" placeholder="部门名称"></el-input>
         </div>
         <div>
           <span class="from-title">默认岗位：</span>
-          <el-select v-model="value" placeholder="请选择">
+          <el-select v-model="curDepart.DefaultPostId" placeholder="请选择">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="post in postList"
+              :key="post.PostId"
+              :label="post.PostName"
+              :value="post.PostId"
             ></el-option>
           </el-select>
         </div>
         <div>
           <span class="from-title">排&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;序：</span>
-          <el-input class="new-phone" v-model="input3" placeholder="请输入序号" type="number"></el-input>
+          <el-input
+            class="new-phone"
+            v-model="curDepart.Sequence"
+            placeholder="请输入序号"
+            type="number"
+          ></el-input>
         </div>
         <div class="changePsw-bottom">
           <el-button type="text" class="btn-cancel" @click="showDepartDig=false">取消</el-button>
-          <el-button class="btn-save">保存</el-button>
+          <el-button class="btn-save" @click="addOrUpdateMyBranchDepartment">保存</el-button>
         </div>
       </div>
     </el-dialog>
@@ -77,76 +87,168 @@ export default {
   data() {
     return {
       searchStr: "",
-      tableData: [
-        {
-          index: "1",
-          depart: "销售部",
-          post: "销售员"
-        },
-        {
-          index: "2",
-          depart: "销售部",
-          post: "销售员"
-        },
-        {
-          index: "3",
-          depart: "销售部",
-          post: "销售员"
-        },
-        {
-          index: "4",
-          depart: "销售部",
-          post: "销售员"
-        }
-      ],
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕"
-        },
-        {
-          value: "选项2",
-          label: "双皮奶"
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎"
-        },
-        {
-          value: "选项4",
-          label: "龙须面"
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭"
-        }
-      ],
-      value: "",
-      input1: "",
-      input2: "",
-      input3: "",
-      showDepartDig: false
+      departList: [],
+      postList: [],
+      curDepart: {},
+      tableHeight: "635",
+      tableBoxHeight: "",
+      showDepartDig: false,
+      digTitle: ""
     };
   },
+  props: {
+    inputSearchPlaceholder: ""
+  },
   computed: {},
+  created() {
+    this.loadResize();
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.getDomHeight();
+      }, 1);
+    });
+  },
+  mounted() {
+    this.getMyBranchDepartmentList();
+  },
   methods: {
     handleClose(done) {
       done();
     },
-    editDepartDig() {
+    editDepartDig(rowData) {
+      this.curDepart = clone(rowData);
+      this.digTitle = "编辑";
+      this.getMyBranchPostList();
       this.showDepartDig = true;
+    },
+    showAddDig() {
+      this.digTitle = "新增";
+      this.getMyBranchPostList();
+      this.curDepart = {};
+      this.showDepartDig = true;
+    },
+    loadResize() {
+      let that = this;
+      $(window).resize(() => {
+        that.getDomHeight();
+      });
+    },
+    //获取元素高度
+    getDomHeight() {
+      this.tableBoxHeight = $(this.$refs.tableBox).height();
+      console.log("tableBoxHeight", this.tableBoxHeight);
+      this.tableHeight = this.tableBoxHeight;
+    },
+
+    /**
+     * 查询部门信息列表
+     */
+    getMyBranchDepartmentList() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyBranchDepartmentList`,
+        data: { BranchId: getkevalue().branchid, SearchName: this.searchStr },
+        success(res) {
+          if (res.data.status) {
+            that.departList = res.data.data;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+    /**
+     * 获取岗位列表
+     */
+    getMyBranchPostList() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyBranchPostList`,
+        data: { BranchId: getkevalue().branchid },
+        success(res) {
+          if (res.data.status) {
+            that.postList = res.data.data;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+
+    /**
+     * 修改(新增)部门
+     */
+    addOrUpdateMyBranchDepartment() {
+      let that = this;
+      let type = "add";
+      if (
+        !this.curDepart.DepartmentName ||
+        this.curDepart.DepartmentName == ""
+      ) {
+        that.$message({
+          message: "部门名称不能为空",
+          type: "warning"
+        });
+        return;
+      }
+      if (this.curDepart.DepartmentId && this.curDepart.DepartmentId != "") {
+        type = "update";
+      }
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/AddOrUpdateMyBranchDepartment`,
+        data: {
+          BranchId: getkevalue().branchid,
+          DepartmentId: this.curDepart.DepartmentId,
+          DepartmentName: this.curDepart.DepartmentName,
+          Sequence: this.curDepart.Sequence,
+          DefaultPostId: this.curDepart.DefaultPostId,
+          Type: type
+        },
+        success(res) {
+          if (res.data.status) {
+            that.$message({
+              message: "操作成功",
+              type: "success"
+            });
+            this.showDepartDig = false;
+            that.getMyBranchDepartmentList();
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
     }
   }
 };
 </script>
 
 <style scoped>
+@import "../../../static/css/orderTableStyle.css";
 .user-content {
-  margin: 5px 48px 20px 48px;
+  height: 93%;
+  margin: 0px 48px 20px 48px;
 }
 .div-search {
   width: 415px;
-  height: 100px;
+  height: 12.5%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -263,6 +365,11 @@ export default {
 
 <!--无scoped 覆盖框架默认样式-->
 <style lang="scss">
+.change-dialog .el-input__inner {
+  width: 184px;
+  height: 32px;
+  padding-left: 12px;
+}
 .depart-header {
   height: 34px;
   background: #bbbbbb !important;
@@ -322,6 +429,13 @@ export default {
 .change-dialog .el-dialog__headerbtn {
   top: 29px;
   font-size: 25px;
+}
+
+/*设置页面弹窗居中*/
+.user-content > .el-dialog__wrapper {
+  position: absolute !important;
+  display: flex;
+  align-items: center;
 }
 </style>
 

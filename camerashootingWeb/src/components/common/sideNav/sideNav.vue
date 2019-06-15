@@ -52,7 +52,7 @@
         url2: '../../../../static/img/common/shebei2.png',
         isSelected: false,
         isEnter: false,
-        path: '/demoPage'
+        path: '/deviceHome'
       },
       {
         name: '财务',
@@ -60,7 +60,7 @@
         url2: '../../../../static/img/common/price2.png',
         isSelected: false,
         isEnter: false,
-        path: '/demoPage'
+        path: '/caiwu'
       },
       {
         name: '统计',
@@ -68,7 +68,7 @@
         url2: '../../../../static/img/common/tj2.png',
         isSelected: false,
         isEnter: false,
-        path: '/demoPage'
+        path: '/deviceHome'
       },
       {
         name: '设置',

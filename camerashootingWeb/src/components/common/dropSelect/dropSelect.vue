@@ -1,6 +1,6 @@
 <template>
   <div id="dropSelect">
-    <el-select v-model="dropSelectValue" @change="changeDropSelect">
+    <el-select :placeholder="dropSelect1Placeholder" clearable  v-model="dropSelectValue" @change="changeDropSelect">
       <el-option
         v-for="item in options"
         :key="item.value"
@@ -15,10 +15,12 @@
 <script>
   export default {
     name: "dropSelect",
-    props: ['options'],
+    props: ['options','dropSelect1Placeholder'],
     methods: {
       changeDropSelect(val){
-        this.$emit('changeDropSelect',val)
+        setTimeout(()=>{
+          this.$emit('changeDropSelect',this.dropSelectObj)
+        })
       }
     },
     mounted() {
@@ -27,8 +29,18 @@
     },
     data() {
       return {
-        dropSelectValue:'',
+        dropSelectValue:'',//双向选择的id
+        dropSelectObj:[],//保存双向选择的对象
       };
+    },
+    watch:{
+      dropSelectValue(val){
+        this.options.forEach((item,index,arr)=>{
+          if (arr[index].value==this.dropSelectValue){
+            this.dropSelectObj=[arr[index]];
+          }
+        })
+      }
     }
   }
 </script>
@@ -38,6 +50,9 @@
     font-size: 14px;
     color: #4C4C4C;
     height: 32px;
+  }
+  >>> .el-input__inner::-webkit-input-placeholder {
+    color: #BBB;
   }
   >>> .el-select .el-input .el-select__caret {
     line-height: 32px;

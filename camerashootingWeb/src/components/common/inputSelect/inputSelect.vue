@@ -2,7 +2,7 @@
   <div id="app">
     <div class="bigBox" id="bigBox">
       <div class="inputBox avoid"><!--@keyup="searchNews($event)"-->
-        <input type="text" id="inputSelect" autocomplete="off" v-model="searchText" @keyup="searchNo($event)"
+        <input type="text" id="inputSelect" autocomplete="off" @keyup.enter="searchNews" v-model="searchText" @keyup="searchNo($event)"
                class="inputSelect avoid" @focus="inputFocus($event)" @blur="inputBlur($event)" placeholder="请输入查询内容">
         <div class="searchBtn avoid" @click="searchNews"><!--@click="searchNews"-->
           <span class="avoid"></span>
@@ -27,8 +27,8 @@
                 <label class="avoid" v-cloak>{{items.name}}</label>
                 <div class="list avoid">
                   <template v-for="(items2,index2) in items.data">
-                  <span v-cloak @click="selectThis(items2)"
-                        :class="['avoid',{spanIsSelected:items2.isSelected}]">{{items2.name}}</span>
+                  <span v-cloak @click="selectThis(items,items2)"
+                        :class="['avoid',{spanIsSelected:items2.isSelected}]" v-if="items2.num!=0">{{items2.name}}({{items2.num}})</span>
                   </template>
                 </div>
               </li>
@@ -43,10 +43,37 @@
 <script>
   //事件
   var myMethods = {
+
     /*============change===========*/
     //选中当前
-    selectThis(itemsObj) {
-      itemsObj.isSelected = !itemsObj.isSelected;
+    selectThis(itemObj1, itemObj2) {
+      // if (itemObj1.id == 1) {
+      //   if (itemObj2.id != 1 && itemObj2.id != 2) {
+      //     this.searchData[0].data.forEach((item, index, arr) => {
+      //       if (arr[index].id != 1 && arr[index].id != 2) {
+      //         arr[index].isSelected = false;
+      //       }
+      //     });
+      //     itemObj2.isSelected = !itemObj2.isSelected;
+      //   } else if (itemObj2.id == 1) {
+      //     this.searchData[0].data.forEach((item, index, arr) => {
+      //       if (arr[index].id == 2) {
+      //         arr[index].isSelected = false;
+      //       }
+      //     });
+      //     itemObj2.isSelected = !itemObj2.isSelected;
+      //   } else if (itemObj2.id == 2) {
+      //     this.searchData[0].data.forEach((item, index, arr) => {
+      //       if (arr[index].id == 1) {
+      //         arr[index].isSelected = false;
+      //       }
+      //     });
+      //     itemObj2.isSelected = !itemObj2.isSelected;
+      //   }
+      // } else {
+      //   itemObj2.isSelected = !itemObj2.isSelected;
+      // }
+      itemObj2.isSelected = !itemObj2.isSelected;
       this.getIsSelectedTag();
       this.isAllNotSelected();
     },
@@ -82,7 +109,121 @@
       // this.$emit('showSelectBox')
       $(e.target).css('border', '1px solid #9AB6E4');
       this.isShowSelectBox = true;
+      this.getOurOrderData();
     },
+
+    //获取我的订单中的数据并做处理
+    getOurOrderData() {
+      let data = this.$parent.$refs.ourOrderRouterView.tableData2.data;
+      let data2 = this.$parent.$refs.ourOrderRouterView.tableData2;
+      let willBack = [];//待回馈订单
+      let PSArr = [];//待安排拍摄
+      let HQArr = [];//待安排后期
+      let PSHandoverArr = [];//拍摄待交接
+      let HQMakeArr = [];//后期制作
+      let willPassArr = [];//待审核
+      let returnArr = [];//退回
+      let willToKHArr = [];//待移交客户
+      let orderSuccessArr = [];//订单完成
+      data.forEach((item, index, arr) => {
+        if (arr[index].OrderState == null || arr[index].OrderState == 0) {
+          willBack.push(arr[index]);
+        }
+        if (arr[index].PSList.length == 0) {
+          PSArr.push(arr[index]);
+        }
+        if (arr[index].HQList.length == 0) {
+          HQArr.push(arr[index]);
+        }
+        if (arr[index].OrderState == '1') {
+          PSHandoverArr.push(arr[index]);
+        }
+        if (arr[index].OrderState == '2') {
+          HQMakeArr.push(arr[index]);
+        }
+        if (arr[index].OrderState == '3') {
+          willPassArr.push(arr[index]);
+        }
+        if (arr[index].OrderState == '4') {
+          returnArr.push(arr[index]);
+        }
+        if (arr[index].OrderState == '5') {
+          willToKHArr.push(arr[index]);
+        }
+        if (arr[index].OrderState == '6') {
+          orderSuccessArr.push(arr[index]);
+        }
+      });
+      this.searchData[0].data[0] = {listId: 1, name: '待回馈订单', isSelected: false, type: '', num: willBack.length, id: 0};
+      this.searchData[0].data[1] = {listId: 0, name: '待安排拍摄', isSelected: false, type: '', num: PSArr.length, id: -1};
+      this.searchData[0].data[2] = {listId: 0, name: '待安排后期', isSelected: false, type: '', num: HQArr.length, id: -2};
+      this.searchData[0].data[3] = {
+        listId: 1,
+        name: '拍摄待交接',
+        isSelected: false,
+        type: '',
+        num: PSHandoverArr.length,
+        id: 1
+      };
+      this.searchData[0].data[4] = {listId: 1, name: '后期制作', isSelected: false, type: '', num: HQMakeArr.length, id: 2};
+      this.searchData[0].data[5] = {
+        listId: 1,
+        name: '待审核',
+        isSelected: false,
+        type: '',
+        num: willPassArr.length,
+        id: 3
+      };
+      this.searchData[0].data[6] = {listId: 1, name: '退回', isSelected: false, type: '', num: returnArr.length, id: 4};
+      this.searchData[0].data[7] = {
+        listId: 1,
+        name: '待移交客户',
+        isSelected: false,
+        type: '',
+        num: willToKHArr.length,
+        id: 5
+      };
+      this.searchData[0].data[8] = {
+        listId: 1,
+        name: '订单完成',
+        isSelected: false,
+        type: '',
+        num: orderSuccessArr.length,
+        id: 6
+      };
+      // console.log(this.searchData)
+
+      /*项目*/
+      data2.AdvancedQueryModel.XMList.forEach((item, index, arr) => {
+        arr[index].name = arr[index].QueryProjectName;
+        arr[index].isSelected = false;
+        arr[index].type = '';
+        arr[index].num = arr[index].QueryProjectNum;
+        arr[index].listId = 2;
+      });
+      this.searchData[1].data = data2.AdvancedQueryModel.XMList;
+
+      /*销售*/
+      data2.AdvancedQueryModel.XSList.forEach((item, index, arr) => {
+        arr[index].name = arr[index].QueryProjectName;
+        arr[index].isSelected = false;
+        arr[index].type = '';
+        arr[index].num = arr[index].QueryProjectNum;
+        arr[index].listId = 3;
+      });
+      this.searchData[2].data = data2.AdvancedQueryModel.XSList;
+      /*拍摄*/
+      data2.AdvancedQueryModel.PSList.forEach((item, index, arr) => {
+        arr[index].name = arr[index].QueryProjectName;
+        arr[index].isSelected = false;
+        arr[index].type = '';
+        arr[index].num = arr[index].QueryProjectNum;
+        arr[index].listId = 4;
+      });
+      this.searchData[3].data = data2.AdvancedQueryModel.PSList;
+    },
+
+
     //获取光标显示
     inputBlur(e) {
       // this.$emit('showSelectBox')
@@ -93,7 +234,7 @@
     loadEvent() {
       let that = this;
       $('body').on('click', e => {
-        if ($(e.target).attr('class')!=undefined){
+        if ($(e.target).attr('class') != undefined) {
           if ($(e.target).attr('class').indexOf('avoid') == -1) {
             that.isShowSelectBox = false;
           } else {
@@ -106,8 +247,127 @@
 
     //关键词查询
     searchNews() {
-      this.$emit('searchNews', this.searchText)
+      if (this.searchText==''){
+        this.searchTableData = [];
+        // console.log(this.tags);
+        this.tags.forEach((item, index, arr) => {
+          if (arr[index].listId == 1) {//其余7种状态
+            this.filterData(arr[index].id, arr[index].listId);
+          } else if (arr[index].listId == 0) {//2种特殊状态
+            this.filterData(arr[index].id, arr[index].listId);
+          } else if (arr[index].listId == 2) {//项目
+            this.filterData(arr[index].OrderIdList, arr[index].listId);
+          } else if (arr[index].listId == 3) {//销售
+            this.filterData(arr[index].OrderIdList, arr[index].listId);
+          } else if (arr[index].listId == 4) {//拍摄
+            this.filterData(arr[index].OrderIdList, arr[index].listId);
+          }
+        })
+      } else {
+        this.filterData2(this.searchText);
+      }
     },
+
+    //关键词筛选
+    filterData2(text){
+      let data = this.$parent.$refs.ourOrderRouterView.tableData2.data;
+      let result = data.filter((item) => {
+        if (item.HotelName.indexOf(text)!=-1) {//酒店
+          return item;
+        }else if (item.WeddingName.indexOf(text)!=-1){//公司名称
+          return item;
+        }else if (item.CustomerName.indexOf(text)!=-1){//客户名称
+          return item;
+        }else if (item.ProjectName.indexOf(text)!=-1){//项目名称
+          return item;
+        }
+      });
+      this.searchTableData=result;
+      this.$parent.$refs.ourOrderRouterView.tableData=this.searchTableData;
+    },
+
+    //筛选数据
+    filterData(obj, listId) {//obj:空或者0 待回馈订单  1拍摄待交接   2后期制作   3待审核  4退回   5待移交客户  6订单完成
+      // let data=this.searchTableData;
+      let data = this.$parent.$refs.ourOrderRouterView.tableData2.data;
+      // console.log(data)
+      if (listId == 1) {
+        // console.log(obj)
+        let result = data.filter((item) => {
+          // console.log(item.OrderState)
+          if (item.OrderState == obj) {
+            return item;
+          }
+        });
+        this.searchTableData = this.searchTableData.concat(result);
+      } else if (listId == 0) {
+        if (obj == -1) {
+          let result = data.filter((item) => {
+            if (item.PSList.length == 0) {
+              return item;
+            }
+          });
+          this.searchTableData = this.searchTableData.concat(result);
+        } else if (obj == -2) {
+          let result = data.filter((item) => {
+            if (item.HQList.length == 0) {
+              return item;
+            }
+          });
+          this.searchTableData = this.searchTableData.concat(result);
+        }
+      } else if (listId == 2) {
+        data.forEach((item, index, arr) => {
+          obj.forEach((item2, index2, arr2) => {
+            if (arr2[index2] == arr[index].OrderId) {
+              this.searchTableData.push(arr[index]);
+            }
+          })
+        });
+      } else if (listId == 3) {
+        data.forEach((item, index, arr) => {
+          obj.forEach((item2, index2, arr2) => {
+            if (arr2[index2] == arr[index].OrderId) {
+              this.searchTableData.push(arr[index]);
+            }
+          })
+        });
+      } else if (listId == 4) {
+        data.forEach((item, index, arr) => {
+          obj.forEach((item2, index2, arr2) => {
+            if (arr2[index2] == arr[index].OrderId) {
+              this.searchTableData.push(arr[index]);
+            }
+          })
+        });
+      }
+      setTimeout(() => {
+        this.sortFn();
+      });
+    },
+
+    //JSON数据去重并排序
+    sortFn() {
+      this.searchTableData.sort(function (a, b) {
+        return new Date(b.OrderDate).getTime() - new Date(a.OrderDate).getTime()
+      });
+      this.searchTableData = this.unique(this.searchTableData, 'OrderId');
+      this.$parent.$refs.ourOrderRouterView.tableData=this.searchTableData;
+    },
+    //json数据去重
+    unique(arr, attribute) {
+      var new_arr = [];
+      var json_arr = [];
+      for (var i = 0; i < arr.length; i++) {
+        if (new_arr.indexOf(arr[i][attribute]) == -1) {    //  -1代表没有找到
+          new_arr.push(arr[i][attribute]);   //如果没有找到就把这个name放到arr里面，以便下次循环时用
+          json_arr.push(arr[i]);
+        } else {
+        }
+      }
+      return json_arr;
+    },
+
     //关键词为空
     searchNo(e) {
       if ($(e.target).val() == "") {
@@ -133,6 +393,7 @@
         searchText: '',
         isShowSelectBox: false,
         isShowAddInput: false,
+        searchTableData: [],
         tags: [
           {name: '周杰伦（11）', type: ''},
           {name: '吴建达', type: ''},
@@ -144,35 +405,27 @@
         searchData: [
           {
             name: '状态:',
-            data: [{name: '哈哈哈哈1', isSelected: false, type: ''}, {
-              name: '哈哈哈哈2',
-              isSelected: false,
-              type: ''
-            }, {name: '哈哈哈哈3', isSelected: false, type: ''},]
+            id: 1,
+            data: []
           },
           {
             name: '项目:',
-            data: [{name: '哈哈哈哈12', isSelected: false, type: ''}, {
-              name: '哈哈哈哈5',
-              isSelected: false,
-              type: ''
-            }, {name: '哈哈哈哈77', isSelected: false, type: ''},]
+            id: 2,
+            data: [
+              // {name: '哈哈哈哈12', isSelected: false, type: ''},
+              // {name: '哈哈哈哈5', isSelected: false, type: ''},
+              // {name: '哈哈哈哈77', isSelected: false, type: ''},
+            ]
           },
           {
             name: '销售:',
-            data: [{name: '哈哈哈哈13', isSelected: false, type: ''}, {
-              name: '哈哈哈哈6',
-              isSelected: false,
-              type: ''
-            }, {name: '哈哈哈哈66', isSelected: false, type: ''},]
+            id: 3,
+            data: []
           },
           {
             name: '拍摄:',
-            data: [{name: '哈哈哈哈14', isSelected: false, type: ''}, {
-              name: '哈哈哈哈7',
-              isSelected: false,
-              type: ''
-            }, {name: '哈哈哈哈88', isSelected: false, type: ''},]
+            id: 4,
+            data: []
           },
         ]
       }
@@ -181,7 +434,15 @@
     watch: {
       searchText(val) {
         this.searchText = val
-      }
+        if (val==''){
+          this.$parent.$refs.ourOrderRouterView.tableData=this.$parent.$refs.ourOrderRouterView.tableData2.data;
+        }
+      },
+      tags(val){
+        if (val.length==0){
+          this.$parent.$refs.ourOrderRouterView.tableData=this.$parent.$refs.ourOrderRouterView.tableData2.data;
+        }
+      },
     },
     mounted() {
       window.Vue = this;
@@ -251,6 +512,10 @@
     padding-left: 10px;
     box-sizing: border-box;
     outline: none;
+  }
+
+  .inputSelect::-webkit-input-placeholder {
+    color: #BBB;
   }
 
   .searchBtn {

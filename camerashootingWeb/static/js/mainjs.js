@@ -1,5 +1,5 @@
 ﻿var serverurl = "";//服务端地址
-var Cosip = "https://xlfile-1256392453.file.myqcloud.com/";
+var Cosip = "https://xlfile-1256392453.file.myqcloud.com";
 // var Cosip2 = "https://xlfile-1256392453.file.myqcloud.com/";
 function getkevalue() {
     //var returnval = jsaction.getkeyvalue(); //本地代码获取基础数据  地址|用户id|用户店ID|key

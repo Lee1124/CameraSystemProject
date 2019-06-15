@@ -28,7 +28,7 @@
     methods: {
       changeStartTime(val) {
         //格式化转化
-        let date = new Date(+val + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '').replace(/-/g, '/').split(" ")[0];
+        let date = new Date(+val + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '').replace(/-/g, '-').split(" ")[0];
         if (date == '1970/01/01') {
           date = ''
         }
@@ -36,7 +36,7 @@
       },
       changeEndTime(val) {
         //格式化转化
-        let date = new Date(+val + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '').replace(/-/g, '/').split(" ")[0];
+        let date = new Date(+val + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '').replace(/-/g, '-').split(" ")[0];
         if (date == '1970/01/01') {
           date = ''
         }
@@ -51,8 +51,8 @@
 
     },
     created() {
-      // this.value1 = this.getTime().startDate;
-      // this.value2 = this.getTime().endDate;
+      this.value1 = getTimeSlot(30,'-').startTime;
+      this.value2 = getTimeSlot(30,'-').endTime;
     },
     data() {
       return {
@@ -82,6 +82,7 @@
 
   .timeSelectStyle .el-input__icon {
     line-height: 32px;
+    font-size: 18px;
   }
 
   .timeSelectStyle .el-input__prefix {

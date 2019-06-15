@@ -14,7 +14,7 @@
               <span v-text="weekValue"></span>
             </div>
             <div class="select noSelect">
-              <dropSelect></dropSelect>
+              <dropSelect2></dropSelect2>
             </div>
             <div class="list" :style="{height:workBoxListHeight}">
               <ul>
@@ -692,6 +692,11 @@
   @media (max-width: 1600px) {
     .daySpanBox {
       width: 72%;
+    }
+  }
+  @media (max-width: 1400px) {
+    .daySpanBox {
+      width: 85%;
     }
   }
 </style>

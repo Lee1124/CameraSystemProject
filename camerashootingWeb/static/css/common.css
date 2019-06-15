@@ -123,6 +123,41 @@ html, body {
   align-items: center; */
 }
 
+/*文字提示样式*/
+.orderTips.el-tooltip__popper {
+  background: #FFF!important;
+  color: #666666!important;
+  font-size: 13px!important;
+  box-shadow:0 3px 6px 0 rgba(0, 0, 0, 0.17) !important;
+}
+
+.orderTips.el-tooltip__popper[x-placement^=top] .popper__arrow:after {
+  border-top-color: #FFF;
+}
+
+.orderTips.el-tooltip__popper .popper__arrow {
+ border-width: 0!important;
+}
+
+/*消息提示样式*/
+.msgTips {
+  min-width: 250px!important;
+  margin-left: 6%!important;
+  z-index: 99999999999!important;
+}
+
+/*加载图标样式*/
+.el-loading-mask {
+  background-color: rgba(255,255,255,.6)!important;
+}
+.el-loading-spinner .path {
+  display: none;
+}
+.el-loading-spinner .circular {
+  background: url("../img/common/loading.gif") no-repeat center center;
+}
+
+
 
 
 

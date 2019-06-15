@@ -1,8 +1,9 @@
 <template>
   <div class="personal-content">
     <div class="personal-icon">
-      <img :src="userInfo.ImgUrl">
-      <el-button>更换头像</el-button>
+      <input type="file" id="file" style="opacity: 0;width: 0;height: 0;" @change="AppendPicture">
+      <img :src="userInfo.ImgSrc">
+      <el-button @click="changeIcon">更换头像</el-button>
       <el-button class="change-psd" @click="showPsdModal">修改密码</el-button>
     </div>
     <div class="personal-info">
@@ -36,7 +37,7 @@
           </div>
           <div>
             <span class="span-new">新号码：</span>
-            <el-input class="new-phone" v-model="newPhone" placeholder="请输入新号码"></el-input>
+            <el-input class="new-phone" size="small" v-model="newPhone" placeholder="请输入新号码"></el-input>
           </div>
         </div>
         <div class="dialog-bottom">
@@ -61,15 +62,33 @@
       <div class="changePsw-main">
         <div>
           <span class="from-title">原密码：</span>
-          <el-input class="new-phone" v-model="oldPsw" placeholder="输入原密码" show-password></el-input>
+          <el-input
+            class="new-phone"
+            size="small"
+            v-model="oldPsw"
+            placeholder="输入原密码"
+            show-password
+          ></el-input>
         </div>
         <div>
           <span class="from-title">新密码：</span>
-          <el-input class="new-phone" v-model="newPsw" placeholder="输入新密码" show-password></el-input>
+          <el-input
+            class="new-phone"
+            size="small"
+            v-model="newPsw"
+            placeholder="输入新密码"
+            show-password
+          ></el-input>
         </div>
         <div>
           <span class="from-title">确认新密码：</span>
-          <el-input class="new-phone" v-model="againPsd" placeholder="再次输入新密码" show-password></el-input>
+          <el-input
+            class="new-phone"
+            size="small"
+            v-model="againPsd"
+            placeholder="再次输入新密码"
+            show-password
+          ></el-input>
         </div>
         <div class="changePsw-bottom">
           <el-button type="text" class="btn-cancel" @click="changePsw=false">取消</el-button>
@@ -80,10 +99,13 @@
   </div>
 </template>
 <script>
+//定义一个放图片信息的数组
+var imgArr = [];
+
 export default {
   data() {
     return {
-      userInfo: {},
+      userInfo: { ImgUrl: "" },
       dialogVisible: false,
       changePsw: false,
       oldPsw: "",
@@ -96,6 +118,23 @@ export default {
     this.getMyUserInfoDetail();
   },
   methods: {
+    //上传图片获得图像的url地址(二进制源码)
+    AppendPicture() {
+      var imgNum = document.getElementById("file").files.length; //图片数量
+      for (var i = 0; i < imgNum; i++) {
+        var imgNews = document.getElementById("file").files[i];
+        imgArr.push(imgNews);
+      }
+      //上传
+      this.$UpImgFile({
+        file: imgArr,
+        path: "Camera/HeadImg/",
+        callback: (that, res) => {
+          this.userInfo.ImgUrl = that.key.substring(1);
+          this.updateUserHeadImgUrl();
+        }
+      });
+    },
     /**
      * 关闭弹窗
      */
@@ -119,6 +158,12 @@ export default {
       this.changePsw = true;
     },
     /**
+     * 上传头像
+     */
+    changeIcon() {
+      $("#file").trigger("click");
+    },
+    /**
      * 获取用户信息
      */
     getMyUserInfoDetail() {
@@ -128,14 +173,48 @@ export default {
         url: `${
           getkevalue().apiurl
         }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyUserInfoDetail`,
-        data: { UserId: 1 },
+        data: { UserId: getkevalue().userid },
         success(res) {
           if (res.data.status) {
             that.userInfo = res.data.data;
+            that.userInfo.ImgSrc = cosIp + "/" + that.userInfo.ImgUrl;
+            that.userInfo.AddTime = getFormatTime(res.data.data.AddTime);
           }
         },
         error(err) {
           console.log(err);
+        }
+      });
+    },
+    /**
+     * 修改头像
+     */ updateUserHeadImgUrl() {
+      if (!this.userInfo.ImgUrl || this.userInfo.ImgUrl == "") {
+        this.$message({
+          message: "请先上传头像",
+          type: "warning"
+        });
+        return;
+      }
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/UpdateUserHeadImgUrl`,
+        data: { UserId: getkevalue().userid, ImgUrl: this.userInfo.ImgUrl },
+        success(res) {
+          if (res.data.status) {
+            that.dialogVisible = false;
+            that.getMyUserInfoDetail();
+            that.$message({
+              message: "操作成功",
+              type: "success"
+            });
+          }
+        },
+        error(err) {
+          this.$message.error(err);
         }
       });
     },
@@ -143,23 +222,32 @@ export default {
      * 修改手机号码
      */
     updateUserBasicPhone() {
-      //进行手机号码格式验证  --未实现
+      if (!checkPhone(this.newPhone)) {
+        this.$message({
+          message: "电话号码格式错误",
+          type: "warning"
+        });
+        return;
+      }
       let that = this;
       this.$Axios({
         method: "POST",
         url: `${
           getkevalue().apiurl
         }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/UpdateUserBasicPhone`,
-        data: { UserId: 1, Phone: this.newPhone },
+        data: { UserId: getkevalue().userid, Phone: this.newPhone },
         success(res) {
           if (res.data.status) {
             that.dialogVisible = false;
             that.getMyUserInfoDetail();
-            alert("修改成功");
+            that.$message({
+              message: "操作成功",
+              type: "success"
+            });
           }
         },
         error(err) {
-          console.log(err);
+          this.$message.error(err);
         }
       });
     },
@@ -167,9 +255,22 @@ export default {
      * 修改密码
      */
     updateUserBasicPassword() {
-      //进行密码验证  --未实现
+      if (
+        this.oldPsw.indexOf(" ") != -1 ||
+        this.againPsd.indexOf(" ") ||
+        this.newPsw.indexOf(" ")
+      ) {
+        this.$message({
+          message: "密码不能包含空格",
+          type: "warning"
+        });
+        return;
+      }
       if (this.newPsw != this.againPsd) {
-        alert("两次密码不一致");
+        that.$message({
+          message: "两次密码不一致",
+          type: "warning"
+        });
       } else {
         let that = this;
         this.$Axios({
@@ -178,7 +279,7 @@ export default {
             getkevalue().apiurl
           }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/UpdateUserBasicPassword`,
           data: {
-            UserId: 1,
+            UserId: getkevalue().userid,
             OldPassWord: this.oldPsw,
             NewPassWord: this.newPsw
           },
@@ -186,11 +287,16 @@ export default {
             if (res.data.status) {
               that.changePsw = false;
               that.getMyUserInfoDetail();
-              alert("修改成功");
+              that.$message({
+                message: "操作成功",
+                type: "success"
+              });
+            } else {
+              this.$message.error(res.data.msg);
             }
           },
           error(err) {
-            console.log(err);
+            this.$message.error(err);
           }
         });
       }
@@ -401,14 +507,15 @@ export default {
   font-size: 25px;
 }
 
-.change-dialog .el-input__inner {
+.changePsw-main .el-input__inner,
+.dialog-main .el-input__inner {
   width: 184px;
-  height: 32px;
+  // height: 32px;
   padding-left: 12px;
 }
 
 /*设置页面弹窗居中*/
-.setting-content .el-dialog__wrapper {
+.personal-content .el-dialog__wrapper {
   position: absolute !important;
   display: flex;
   align-items: center;

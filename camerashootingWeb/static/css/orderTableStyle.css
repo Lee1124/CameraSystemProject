@@ -1,4 +1,7 @@
-
+>>> .el-table {
+  background: #F6F6F6;
+  border-left: 0;
+}
 >>> .el-table__body-wrapper::-webkit-scrollbar {
   width: 3px;
   height: 5px;
@@ -22,6 +25,7 @@
   background: #F6F6F6;
 }
 
+
 >>> .el-table .ascending .sort-caret.ascending {
   border-bottom-color: #5996F8;
 }
@@ -34,11 +38,6 @@
   display: none;
 }
 
->>> .el-table--border::after, .el-table--group::after {
-  height: auto;
-  background: #DDD;
-  bottom: 72px;
-}
 
 >>> .orderTableHeaderStyle th {
   background: #E5E5E5;
@@ -55,9 +54,6 @@
   border: 0;
 }
 
->>> .orderTableHeaderStyle th:first-of-type {
-  border-left: 1px solid #DDD;
-}
 
 >>> .orderTableRowStyle td {
   padding: 0;
@@ -69,9 +65,18 @@
   color: #808080;
 }
 
->>> .orderTableRowStyle td:first-of-type {
+>>> .el-table__header {
   border-left: 1px solid #DDD;
 }
+>>> .el-table__body-wrapper {
+  border-left: 1px solid #DDD;
+}
+
+
+>>> .el-table__body {
+  border-bottom: 1px solid #ececec;
+}
+
 
 >>> .orderTableRowStyle td:first-of-type a {
   color: #5996F8;
@@ -125,12 +130,19 @@
 >>> .el-table__footer-wrapper .has-gutter th.gutter {
   background: #F6F6F6;
   border: 0;
+  border-top: 1px solid #DDD;
 }
 
 >>> .el-table .cell.el-tooltip {
   padding: 0 4px;
 }
 
+>>> .el-table__empty-block {
+  border-bottom: 1px solid #DDD;
+}
+>>> .el-table--border::after, .el-table--group::after {
+  background-color: #DDD;
+}
 .rightClickShadow {
   position: absolute;
   height: 100%;

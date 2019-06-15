@@ -25,7 +25,7 @@
         if (date == '1970/01/01') {
           date = ''
         }
-        this.$emit('changeTime',date);
+        // this.$emit('changeTime',date);
       },
     },
     mounted(){},
@@ -40,11 +40,11 @@
 
 <style>
 
-
   .timeSelectStyle1 .el-input__inner {
     height: 32px;
     color: #4C4C4C;
     font-size: 14px;
+    border-color: #DDD;
   }
 
   .timeSelectStyle1 .el-input__inner::-webkit-input-placeholder {
@@ -53,15 +53,17 @@
 
   .timeSelectStyle1 .el-input__icon {
     line-height: 32px;
+    color: #999999;
   }
 
   .timeSelectStyle1 .el-input__prefix {
-    right: 15px;
+    right: 10px;
     left: auto;
+    font-size: 18px;
   }
 
   .timeSelectStyle1 .el-input__suffix {
-    right: 40px;
+    right: 35px;
   }
 
   .timeSelectStyle1 .el-input--prefix .el-input__inner {

@@ -1,65 +1,70 @@
 <template>
-  <div class="user-content commonScrollStyle">
+  <div class="user-content">
     <div class="div-search">
       <el-input placeholder="搜索人员" v-model="searchStr"></el-input>
       <div>
-        <el-button>查询</el-button>
-        <el-button class="button-add">新增</el-button>
+        <el-button @click="getMyBranchUserList">查询</el-button>
+        <el-button class="button-add" @click="addMoadl">新增</el-button>
       </div>
     </div>
-    <el-tree
-      :data="data"
-      node-key="id"
-      :expand-on-click-node="false"
-      default-expand-all
-      :indent="40"
-      @node-collapse="iconStr='iconStr2'"
-      @node-expand="iconStr='iconStr'"
-      visible-arrow="false"
-    >
-      <div slot-scope="{ node,data }">
-        <div v-if="data.isStaff" class="user-children">
-          <div class="user-info">
-            <img src="static\img\setting\user.png">
-            <span>{{node.label}}</span>
-          </div>
-          <div class="user-info" v-for="staff in data.otherStaff">
-            <el-popover
-              placement="right-start"
-              width="102"
-              trigger="manual"
-              popper-class="operate-popover"
-              v-model="staff.showOperate"
-            >
-              <div class="popover-main noSelect">
-                <span @click="editMoadl">编辑资料</span>
-                <span @click="powerMoadl">权限设置</span>
-                <span @click="deleteMoadl">删除人员</span>
-              </div>
-              <div slot="reference" @click="selectStaff(staff,data)">
-                <img :src="staff.icon">
-                <div>
-                  <span class="staff-post">{{staff.post}}</span>
-                  <span v-show="staff.post&&staff.post!=''">•</span>
-                  <span>{{staff.name}}</span>
+    <div class="div-tree commonScrollStyle">
+      <el-tree
+        :data="data"
+        node-key="id"
+        :expand-on-click-node="false"
+        default-expand-all
+        :indent="40"
+        @node-collapse="iconStr='iconStr2'"
+        @node-expand="iconStr='iconStr'"
+        visible-arrow="false"
+      >
+        <div slot-scope="{ node,data }">
+          <div v-if="data.isStaff" class="user-children">
+            <div class="user-info" @click="addMoadl">
+              <img src="static\img\setting\user.png">
+              <span>{{node.label}}</span>
+            </div>
+            <div class="user-info" v-for="staff in data.otherStaff">
+              <el-popover
+                placement="right-start"
+                width="102"
+                trigger="manual"
+                popper-class="operate-popover"
+                v-model="staff.showOperate"
+              >
+                <div class="popover-main noSelect">
+                  <span @click="editMoadl">编辑资料</span>
+                  <span @click="powerMoadl">权限设置</span>
+                  <span @click="deleteMoadl">删除人员</span>
                 </div>
-              </div>
-            </el-popover>
+                <div slot="reference" @click="selectStaff(staff,data)">
+                  <img :src="staff.HeadImgSrc">
+                  <div>
+                    <span class="staff-post">{{staff.DutyName}}</span>
+                    <span v-show="staff.DutyName&&staff.DutyName!=''">•</span>
+                    <span>{{staff.UserRealName}}</span>
+                  </div>
+                </div>
+              </el-popover>
+            </div>
+          </div>
+          <div v-else>
+            <span :class="data.isRoot?'rootNode':'department-name'">{{ node.label }}</span>
+            <span
+              :class="data.isRoot?'rootNode':'department-name'"
+            >({{data.children[0]?(data.children[0].otherStaff?data.children[0].otherStaff.length:staffCount):''}})</span>
+            <span
+              class="staffName-list"
+              v-for="name in  data.children[0]?(data.children[0].otherStaff):[]"
+            >{{ name.UserRealName}}</span>
           </div>
         </div>
-        <div v-else>
-          <span :class="data.isRoot?'rootNode':'department-name'">{{ node.label }}</span>
-          <span
-            :class="data.isRoot?'rootNode':'department-name'"
-          >({{data.children[0].otherStaff?data.children[0].otherStaff.length:staffCount}})</span>
-          <span class="staffName-list" v-for="name in data.children[0].otherStaff">{{ name.name}}</span>
-        </div>
-      </div>
-    </el-tree>
+      </el-tree>
+    </div>
 
-    <!--新增人员弹窗-->
+    <!--新增、编辑人员弹窗-->
     <el-dialog
-      title="新增员工"
+      :title="editTitle"
       :modal="false"
       top="0"
       :visible.sync="showAddDig"
@@ -71,32 +76,47 @@
     >
       <div class="addDig-main">
         <div class="staff-img">
-          <img src="/static/img/setting/user.png">
-          <span class="img-tip">点击上传头像</span>
+          <input
+            type="file"
+            id="file"
+            style="opacity: 0;width: 0;height: 0;"
+            @change="AppendPicture"
+          >
+          <img :src="curStaff.ImgSrc" :alt="curStaff.ImgSrc" @click="changeIcon">
+          <p style="display:none">{{msg}}</p>
+          <span class="img-tip" @click="changeIcon">{{isUpload?'点击上传头像':'正在上传...'}}</span>
         </div>
         <div class="staff-form">
           <div class="form-item">
-            <el-input v-model="formInline.user" placeholder="员工姓名"></el-input>
-            <el-input v-model="formInline.user" placeholder="自动生成用户名"></el-input>
+            <el-input v-model="curStaff.RealName" placeholder="员工姓名"></el-input>
+            <el-input v-model="curStaff.UserName" placeholder="自动生成用户名"></el-input>
           </div>
           <div class="form-item">
-            <el-input v-model="formInline.user" placeholder="手机号码"></el-input>
-            <el-date-picker v-model="formInline.user" type="date" placeholder="选择入职日期"></el-date-picker>
+            <el-input v-model="curStaff.Phone" placeholder="手机号码"></el-input>
+            <el-date-picker v-model="curStaff.AddTime" type="date" placeholder="选择入职日期"></el-date-picker>
           </div>
           <div class="form-item">
-            <el-select v-model="formInline.user" placeholder="请选择部门">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+            <el-select v-model="curStaff.DepartmentId" placeholder="请选择部门">
+              <el-option
+                v-for="depart in departList"
+                :key="depart.DepartmentId"
+                :label="depart.DepartmentName"
+                :value="depart.DepartmentId"
+              ></el-option>
             </el-select>
-            <el-select v-model="formInline.region" placeholder="请选择职务">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+            <el-select v-model="curStaff.DutyId" placeholder="请选择职务">
+              <el-option
+                v-for="duty in dutyList"
+                :key="duty.DutyId"
+                :label="duty.DutyName"
+                :value="duty.DutyId"
+              ></el-option>
             </el-select>
           </div>
         </div>
         <div class="staff-button">
-          <el-button type="text" class="btn-cancel" @click="showDepartDig=false">取消</el-button>
-          <el-button class="btn-save">保存</el-button>
+          <el-button type="text" class="btn-cancel" @click="showAddDig=false">取消</el-button>
+          <el-button class="btn-save" :disabled="!isUpload" @click="addBranchUser">保存</el-button>
         </div>
       </div>
     </el-dialog>
@@ -115,19 +135,19 @@
     >
       <div class="delete-main">
         <div class="delete-tip">
-          <span class="delete-tip1">是否确定删除该岗位？</span>
-          <span class="delete-tip2">•岗位删除后如遇到问题，请及时联系管理员</span>
+          <span class="delete-tip1">是否确定删除该账号？</span>
+          <span class="delete-tip2">•"{{curStaff.UserRealName}}"账号删除后如遇到问题，请及时联系管理员</span>
         </div>
         <div class="delete-bottom">
           <el-button type="text" class="btn-cancel" @click="showDeletwDig=false">取消</el-button>
-          <el-button class="btn-save">确认删除</el-button>
+          <el-button class="btn-save" @click="deleteMyUserInfo">确认删除</el-button>
         </div>
       </div>
     </el-dialog>
 
     <!--权限弹窗-->
     <el-dialog
-      title="摄影部 易烊千玺 权限设置"
+      :title="curStaff.DepartmentName+' '+curStaff.UserRealName+' 权限设置'"
       :modal="false"
       :visible.sync="showAutDig"
       width="882px"
@@ -139,13 +159,14 @@
     >
       <div class="authority-main commonScrollStyle">
         <div class="authority-list" v-for="auth in authList">
-          <span class="authority-title">订单</span>
+          <span class="authority-title">{{auth.ParentPermissionName}}</span>
           <el-checkbox-group v-model="checkList" class="authority-item">
-            <el-checkbox label="复选框 A"></el-checkbox>
-            <el-checkbox label="复选框 B"></el-checkbox>
-            <el-checkbox label="复选框 C"></el-checkbox>
-            <el-checkbox label="复选框 D"></el-checkbox>
-            <el-checkbox label="复选框 E"></el-checkbox>
+            <el-checkbox
+              v-for="authChild in auth.ChildPermissionModelList"
+              @change="updateBranchUserPermission(authChild)"
+              :label="authChild.ChildPermissionId"
+              :key="authChild.ChildPermissionId"
+            >{{authChild.ChildPermissionName}}</el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
@@ -154,108 +175,45 @@
 </template>
 <script>
 let id = 1000;
+//定义一个放图片信息的数组
+var imgArr = [];
 export default {
   data() {
     return {
       data: [
         {
-          id: 1,
+          id: "root",
           label: "全部人员",
           isRoot: true,
-          children: [
-            {
-              id: 2,
-              label: "销售部",
-              isStaff: false,
-              children: [
-                {
-                  id: 3,
-                  label: "新员工",
-                  isStaff: true,
-                  otherStaff: [
-                    {
-                      id: 4,
-                      name: "刘德华",
-                      post: "总监",
-                      showOperate: false,
-                      icon: "static\\img\\setting\\user.png"
-                    },
-                    {
-                      id: 5,
-                      name: "周杰伦",
-                      post: "",
-                      showOperate: false,
-                      icon: "static\\img\\setting\\user.png"
-                    },
-                    {
-                      id: 6,
-                      name: "何泓姗",
-                      post: "",
-                      showOperate: false,
-                      icon: "static\\img\\setting\\user.png"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              id: 12,
-              label: "行政部",
-              isStaff: false,
-              children: [
-                {
-                  id: 7,
-                  label: "新员工",
-                  isStaff: true,
-                  otherStaff: [
-                    {
-                      id: 8,
-                      name: "王谦",
-                      post: "总监",
-                      showOperate: false,
-                      icon: "static\\img\\setting\\user.png"
-                    },
-                    {
-                      id: 9,
-                      name: "胡歌",
-                      post: "",
-                      showOperate: false,
-                      icon: "static\\img\\setting\\user.png"
-                    },
-                    {
-                      id: 10,
-                      name: "张碧晨",
-                      post: "",
-                      showOperate: false,
-                      icon: "static\\img\\setting\\user.png"
-                    },
-                    {
-                      id: 11,
-                      name: "易烊千玺",
-                      post: "",
-                      showOperate: false,
-                      icon: "static\\img\\setting\\user.png"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+          children: []
+        } //本店员工列表
       ],
-      searchStr: "",
-      curStaff: { id: 0 },
-      showOperate: false,
-      iconStr: "iconStr",
-      showAddDig: false,
-      showDeletwDig: false,
-      showAutDig: false,
-      formInline: {
-        user: "",
-        region: ""
-      },
-      checkList: ["复选框 B", "复选框 A"],
-      authList: ["", "", "", "", "", ""]
+      msg: 1, //强制刷新页面使用
+      searchStr: "", //搜索字符串
+      curStaff: {
+        UserId: "",
+        UserName: "",
+        HeadImgUrl: "static/img/setting/user.png",
+        ImgSrc: "static/img/setting/user.png",
+        RealName: "",
+        Phone: "",
+        AddTime: "",
+        DepartmentId: "",
+        DepartmentName: "",
+        DutyId: ""
+      }, //当前选择的员工
+      showOperate: false, //弹出框是否显示
+      iconStr: "iconStr", //树形展开收起时的自定义类名
+      showAddDig: false, //新增、编辑员工弹窗是否显示
+      showDeletwDig: false, //删除提示是否显示
+      showAutDig: false, //权限编辑弹窗是否显示
+      checkList: [], //选择的权限列表
+      userAuthList: [], //用户的权限
+      authList: [], //所有权限列表
+      departList: [], //部门列表
+      editTitle: "新增员工", //新增、编辑员工弹窗标题
+      dutyList: [], //职务列表
+      isUpload: true //是否上传完成
     };
   },
   computed: {
@@ -269,27 +227,40 @@ export default {
       return count;
     }
   },
+  mounted() {
+    this.getMyBranchUserList();
+    this.getMyBranchDepartmentList();
+    this.getBranchDutyList();
+  },
   methods: {
-    //节点点击事件
-    handleNodeClick(data) {
-      console.log(data);
-    },
-    //添加节点
-    append(data) {
-      const newChild = { id: id++, label: "testtest", children: [] };
-      if (!data.children) {
-        this.$set(data, "children", []);
+    //上传图片获得图像的url地址(二进制源码)
+    AppendPicture() {
+      this.isUpload = false;
+      var imgNum = document.getElementById("file").files.length; //图片数量
+      for (var i = 0; i < imgNum; i++) {
+        var imgNews = document.getElementById("file").files[i];
+        imgArr.push(imgNews);
       }
-      data.children.push(newChild);
+      //上传
+      this.$UpImgFile({
+        file: imgArr,
+        path: "Camera/HeadImg/",
+        callback: (that, res) => {
+          this.curStaff.ImgUrl = that.key.substring(1);
+          this.curStaff.ImgSrc = cosIp + "/" + that.key;
+          this.msg += 1;
+          this.isUpload = true;
+          console.log("上传成功", this.curStaff.ImgSrc);
+        }
+      });
     },
-    //移除节点
-    remove(node, data) {
-      const parent = node.parent;
-      const children = parent.data.children || parent.data;
-      const index = children.findIndex(d => d.id === data.id);
-      children.splice(index, 1);
+    /**
+     * 修改头像
+     */
+    changeIcon() {
+      $("#file").trigger("click");
+      imgArr = [];
     },
-
     /**
      * 选择某个员工
      */
@@ -302,7 +273,9 @@ export default {
         }
       });
       if (staffList) {
-        let staffInfo = staffList.otherStaff.find(s => s.id == staff.id);
+        let staffInfo = staffList.otherStaff.find(
+          s => s.UserId == staff.UserId
+        );
         if (staffInfo) {
           if (!staffInfo.showOperate) {
             this.hideAll();
@@ -328,6 +301,29 @@ export default {
      */
     editMoadl() {
       this.hideAll();
+      this.editTitle = "编辑员工";
+      this.getMyUserInfoDetail().then(() => {
+        this.showAddDig = true;
+      });
+    },
+    /**
+     * 显示新增资料弹窗
+     */
+    addMoadl() {
+      this.hideAll();
+      this.curStaff = {
+        UserId: "",
+        UserName: "",
+        HeadImgUrl: "static/img/setting/user.png",
+        ImgSrc: "static/img/setting/user.png",
+        RealName: "",
+        Phone: "",
+        AddTime: "",
+        DepartmentId: "",
+        DepartmentName: "",
+        DutyId: ""
+      };
+      this.editTitle = "新增员工";
       this.showAddDig = true;
     },
     /**
@@ -335,6 +331,10 @@ export default {
      */
     powerMoadl() {
       this.hideAll();
+      this.getBranchPermission();
+      this.checkList = []; //获取当前选择用户权限列表
+      this.userAuthList = [];
+      this.getBranchUserPermission();
       this.showAutDig = true;
     },
     /**
@@ -349,6 +349,356 @@ export default {
      */
     handleClose(done) {
       done();
+    },
+    /**
+     * 获取用户信息列表
+     */
+    getMyBranchUserList() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyBranchUserList`,
+        data: {
+          UserId: getkevalue().userid,
+          BranchId: getkevalue().branchid,
+          SearchUserName: this.searchStr
+        },
+        success(res) {
+          if (res.data.status) {
+            let userList = [];
+            let nodeId = "";
+            res.data.data.DepartmentList.forEach(d => {
+              nodeId += "n";
+              let user = {
+                id: nodeId,
+                label: "新员工",
+                isStaff: true,
+                otherStaff: []
+              };
+              let depart = {
+                id: d.UserDepartmentName,
+                label: d.UserDepartmentName,
+                isStaff: false,
+                children: [user]
+              };
+              d.UserList.forEach(u => {
+                let staff = {
+                  UserId: u.UserId,
+                  UserRealName: u.UserRealName,
+                  UserName: u.UserName,
+                  DutyName: u.DutyName,
+                  DepartmentName: d.UserDepartmentName,
+                  showOperate: false,
+                  HeadImgSrc: u.UserHeadImgUrl
+                };
+                staff.HeadImgSrc = cosIp + "/" + staff.HeadImgSrc;
+                user.otherStaff.push(staff);
+              });
+              userList.push(depart);
+            });
+            that.data[0].children = userList;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+    /**
+     * 获取选择用户详细信息
+     */
+    getMyUserInfoDetail() {
+      let that = this;
+      return new Promise(function(resolve, reject) {
+        that.$Axios({
+          method: "POST",
+          url: `${
+            getkevalue().apiurl
+          }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetMyUserInfoDetail`,
+          data: { UserId: that.curStaff.UserId },
+          success(res) {
+            if (res.data.status) {
+              that.curStaff = res.data.data;
+              this.curStaff.ImgSrc = cosIp + "/" + that.curStaff.ImgUrl;
+              resolve(res);
+            } else {
+              reject(res);
+              this.$message.error(res.data.msg);
+            }
+          },
+          error(err) {
+            this.$message.error(res.data.msg);
+            reject(err);
+          }
+        });
+      });
+    },
+    /**
+     * 查询部门信息列表
+     */
+    getMyBranchDepartmentList() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetBranchDepartmentList`,
+        data: { BranchId: getkevalue().branchid },
+        success(res) {
+          if (res.data.status) {
+            that.departList = res.data.data;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+    /**
+     * 获取职务列表
+     */
+    getBranchDutyList() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetBranchDutyList`,
+        data: { BranchId: getkevalue().branchid },
+        success(res) {
+          if (res.data.status) {
+            that.dutyList = res.data.data;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+    /**
+     * 新增、编辑员工
+     */
+    addBranchUser() {
+      //数据验证
+
+      let that = this;
+      if (!this.curStaff.ImgUrl || this.curStaff.ImgUrl == "") {
+        that.$message({
+          message: "请先上传头像",
+          type: "warning"
+        });
+        return;
+      }
+      if (!this.curStaff.RealName || this.curStaff.RealName == "") {
+        that.$message({
+          message: "请填写正确的真实姓名",
+          type: "warning"
+        });
+        return;
+      }
+      if (!this.curStaff.UserName || this.curStaff.UserName == "") {
+        that.$message({
+          message: "请填写正确用户名",
+          type: "warning"
+        });
+        return;
+      }
+      if (!this.curStaff.Phone || !checkPhone(this.curStaff.Phone)) {
+        that.$message({
+          message: "请填写正确的电话号码",
+          type: "warning"
+        });
+        return;
+      }
+      if (!this.curStaff.AddTime || this.curStaff.AddTime == "") {
+        that.$message({
+          message: "请填写入职时间",
+          type: "warning"
+        });
+        return;
+      }
+      if (!this.curStaff.DepartmentId || this.curStaff.DepartmentId == "") {
+        that.$message({
+          message: "请选择所属部门",
+          type: "warning"
+        });
+        return;
+      }
+      if (!this.curStaff.DutyId || this.curStaff.DutyId == "") {
+        this.$message({
+          message: "请选择职务",
+          type: "warning"
+        });
+        return;
+      }
+
+      let type = "add";
+      if (this.curStaff.UserId && this.curStaff.UserId != "") {
+        type = "update";
+      }
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/AddBranchUser`,
+        data: {
+          UserName: this.curStaff.UserName,
+          HeadImgUrl: this.curStaff.ImgUrl,
+          UserRealName: this.curStaff.RealName,
+          Phone: this.curStaff.Phone,
+          RZTime: this.curStaff.AddTime,
+          DepartmentId: this.curStaff.DepartmentId,
+          DutyId: this.curStaff.DutyId,
+          Type: type,
+          SearchUserId: this.curStaff.UserId,
+          BranchId: getkevalue().branchid
+        },
+        success(res) {
+          if (res.data.status) {
+            that.getMyBranchUserList();
+            that.showAddDig = false;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+    /**
+     * 删除员工
+     */
+    deleteMyUserInfo() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/DeleteMyUserInfo`,
+        data: {
+          UserId: this.curStaff.UserId
+        },
+        success(res) {
+          if (res.data.status) {
+            that.getMyBranchUserList();
+            that.showDeletwDig = false;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+
+    /**
+     * 获取当前店铺的权限列表
+     */
+    getBranchPermission() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetBranchPermission`,
+        data: { BranchId: getkevalue().branchid },
+        success(res) {
+          if (res.data.status) {
+            that.authList = res.data.data;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+
+    /**
+     * 查询用户权限菜单信息
+     */
+    getBranchUserPermission() {
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/GetBranchUserPermission`,
+        data: {
+          BranchId: getkevalue().branchid,
+          SearchUserId: this.curStaff.UserId
+        },
+        success(res) {
+          if (res.data.status) {
+            that.checkList = [];
+            that.userAuthList = res.data.data;
+            if (res.data.data && res.data.data.length > 0) {
+              res.data.data.forEach(auth => {
+                that.checkList.push(auth.MenuId);
+              });
+            }
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
+    },
+    /**
+     * 新增或者移除菜单权限
+     */
+    updateBranchUserPermission(auth) {
+      let isChecked = false;
+      let UserMenuId = "";
+      if (this.userAuthList.find(ua => ua.MenuId == auth.ChildPermissionId)) {
+        UserMenuId = this.userAuthList.find(
+          ua => ua.MenuId == auth.ChildPermissionId
+        ).UserMenuId;
+      }
+      if (this.checkList.find(a => a == auth.ChildPermissionId)) {
+        isChecked = true;
+      }
+      let that = this;
+      this.$Axios({
+        method: "POST",
+        url: `${
+          getkevalue().apiurl
+        }/xlapi/CameraManage/CameraUserInfoManage/CameraUserInfo/UpdateBranchUserPermission`,
+        data: {
+          BranchId: getkevalue().branchid,
+          SearchUserId: this.curStaff.UserId,
+          Type: isChecked ? "add" : "delete",
+          ChildPermissionId: auth.ChildPermissionId,
+          UserMenuId: UserMenuId
+        },
+        success(res) {
+          if (res.data.status) {
+            that.$message({
+              message: "操作成功",
+              type: "success"
+            });
+            that.getBranchUserPermission();
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        },
+        error(err) {
+          this.$message.error(err);
+        }
+      });
     }
   }
 };
@@ -356,11 +706,13 @@ export default {
 
 <style scoped>
 .user-content {
+  height: 90%;
   margin: 5px 48px 20px 48px;
 }
 .div-search {
   width: 415px;
-  height: 100px;
+  height: 12.97%;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -402,6 +754,11 @@ export default {
   border: 1px solid rgba(89, 150, 248, 1);
 }
 /*树形控件相关*/
+.div-tree {
+  max-height: 87%;
+  overflow-y: auto;
+}
+
 .department-name {
   font-size: 14px;
   font-family: MicrosoftYaHei;
@@ -496,8 +853,12 @@ export default {
 }
 
 .staff-img img {
+  border-radius: 50%;
   max-width: 90px;
   max-height: 90px;
+  width: 90px;
+  height: 90px;
+  cursor: pointer;
 }
 
 .img-tip {
@@ -509,6 +870,7 @@ export default {
   font-family: MicrosoftYaHei;
   font-weight: 400;
   color: #808080;
+  cursor: pointer;
 }
 
 .staff-form {
@@ -632,7 +994,7 @@ export default {
 /*弹窗样式*/
 .add-dialog {
   width: 652px;
-  height: 565px;
+  height: 65.92%;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
 }
@@ -640,7 +1002,7 @@ export default {
 /*删除提示弹窗*/
 .delete-dialog {
   width: 500px;
-  height: 299px;
+  height: 34.89%;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
 }
@@ -648,7 +1010,7 @@ export default {
 /*权限弹窗*/
 .authority-dialog {
   width: 882px;
-  height: 695px;
+  height: 76.89%;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.17);
 }
@@ -730,6 +1092,13 @@ export default {
   transform: rotate(45deg) scaleY(0);
   width: 6px;
   transform-origin: center;
+}
+
+/*设置页面弹窗居中*/
+.user-content > .el-dialog__wrapper {
+  position: absolute !important;
+  display: flex;
+  align-items: center;
 }
 </style>
 

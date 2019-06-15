@@ -3,7 +3,7 @@
 /**
  * 腾讯云资源地址：
  */
-var cosIp = "https://xlfile-1256392453.file.myqcloud.com/";
+var cosIp = "https://xlfile-1256392453.file.myqcloud.com";
 
 /**
  * 获取信息
@@ -12,7 +12,7 @@ var cosIp = "https://xlfile-1256392453.file.myqcloud.com/";
 
 function getkevalue() {
   // var returnval = window.localStorage.userinfo;
-  var returnval = 'http://localhost/|1|2|xlhl|http://localhost:5819/|http://171.211.126.122:8092/|1,1|http://192.168.1.253:8095/|http://192.168.1.79:8088';
+  var returnval = 'http://localhost/|1|1|xlhl|http://localhost:5819/|http://171.211.126.122:8092/|1,1|http://192.168.1.253:8095/|http://192.168.1.79:8088';
   var vararry = returnval.split("|");
   var keyobj = new Object();
   keyobj.url = vararry[0]; //处理服务器ip   211.
@@ -151,3 +151,49 @@ function GetQueryString(name) {
   if (r != null) return unescape(r[2]);
   return null;
 }
+
+/**
+* 对象克隆
+*/
+function clone(obj) {
+  var o;
+  if (typeof obj == "object") {
+    if (obj === null) {
+      o = null;
+    } else {
+      if (obj instanceof Array) {
+        o = [];
+        for (var i = 0, len = obj.length; i < len; i++) {
+          o.push(clone(obj[i]));
+        }
+      } else {
+        if (obj instanceof Date) {
+          o = obj;
+        } else {
+          o = {};
+          for (var j in obj) {
+            o[j] = clone(obj[j]);
+          }
+        }
+      }
+    }
+  } else {
+    o = obj;
+  }
+  return o;
+}
+
+/**
+ * 电话号格式验证
+ */
+function checkPhone(phone) {
+  if (!phone)
+    return false;
+  if (!(/^1[3456789]\d{9}$/.test(phone))) {
+    return false;
+  }
+  return true;
+}
+
+
+
