@@ -10,7 +10,7 @@ export default new Vuex.Store({
     scrollLefts:0,
     defaultTime:'2018/01/01',
   },
-  // 获取数据并渲染
+  // 获取数据（主要是过滤一些数据）
   getters:{
 
   },
